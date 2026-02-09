@@ -12,7 +12,7 @@ class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_expense_id")
-    private Integer id;
+    private Long id;
 
     @NotNull
     @ManyToOne
@@ -44,7 +44,7 @@ class Expense {
     @JoinColumn(name = "fk_status_changed_by")
     private Employee statusChangedBy;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

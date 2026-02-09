@@ -12,7 +12,7 @@ class TravelDocument {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_travel_document_id")
-    private Integer id;
+    private Long id;
 
     @NotNull
     @ManyToOne
@@ -40,7 +40,7 @@ class TravelDocument {
     @NotNull
     private LocalDateTime uploadedAt;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

@@ -10,13 +10,13 @@ public class DocumentType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_document_type_id")
-    private Integer id;
+    private Long id;
 
     @NotBlank
     @Column(nullable = false, unique = true)
     private String name;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

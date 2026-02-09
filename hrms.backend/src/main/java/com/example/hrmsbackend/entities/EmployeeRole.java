@@ -13,7 +13,7 @@ public class EmployeeRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_employee_role_id")
-    private Integer id;
+    private Long id;
 
     @NotNull
     @ManyToOne
@@ -26,9 +26,9 @@ public class EmployeeRole {
     private Role role;
 
     @NotNull
-    private LocalDateTime assignedAt;
+    private LocalDateTime assignedAt = LocalDateTime.now();
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

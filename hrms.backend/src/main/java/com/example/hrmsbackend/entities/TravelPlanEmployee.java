@@ -10,7 +10,7 @@ public class TravelPlanEmployee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_travel_plan_employee_id")
-    private Integer id;
+    private Long id;
 
     @NotNull
     @ManyToOne
@@ -25,7 +25,7 @@ public class TravelPlanEmployee {
     @Positive
     private Integer maxAmountPerDay;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

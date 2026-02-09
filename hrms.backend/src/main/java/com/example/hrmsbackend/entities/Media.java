@@ -12,7 +12,7 @@ public class Media {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_media_id")
-    private Integer id;
+    private Long id;
 
     @NotBlank
     private String mimeType;
@@ -37,7 +37,7 @@ public class Media {
     @NotNull
     private Boolean isDeleted;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

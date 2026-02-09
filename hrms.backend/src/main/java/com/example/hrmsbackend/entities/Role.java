@@ -8,12 +8,12 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_role_id")
-    private Integer id;
+    private Long id;
 
     @Column(unique = true)
     private String name;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

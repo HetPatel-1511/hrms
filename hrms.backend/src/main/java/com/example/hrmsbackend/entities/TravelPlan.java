@@ -12,7 +12,7 @@ public class TravelPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_travel_plan_id")
-    private Integer id;
+    private Long id;
 
     @NotBlank
     private String place;
@@ -34,7 +34,7 @@ public class TravelPlan {
     @JoinColumn(name = "fk_created_by", nullable = false)
     private Employee createdBy;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

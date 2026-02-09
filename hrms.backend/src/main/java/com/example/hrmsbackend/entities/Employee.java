@@ -1,5 +1,6 @@
 package com.example.hrmsbackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -14,7 +15,7 @@ public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_employee_id")
-    private Integer id;
+    private Long id;
 
     @NotBlank
     @Size(max = 100)
@@ -42,11 +43,11 @@ public class Employee {
 
     @NotNull
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @NotNull
     @Column(name = "is_active", nullable = false)
-    private Boolean active;
+    private Boolean active = true;
 
     @ManyToOne
     @JoinColumn(name = "fk_manager_id")
@@ -67,7 +68,7 @@ public class Employee {
     @OneToMany(mappedBy = "employee")
     private List<EmployeeRole> employeeRoles;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -161,6 +162,14 @@ public class Employee {
 
     public List<EmployeeRole> getEmployeeRoles() {
         return employeeRoles;
+    }
+
+    public List<String> getEmployeeRoleNames() {
+        if (employeeRoles!=null){
+            return employeeRoles.stream().map(employeeRole -> employeeRole.getRole().getName()).toList();
+        } else {
+            return List.of();
+        }
     }
 
     public void setEmployeeRoles(List<EmployeeRole> employeeRoles) {
