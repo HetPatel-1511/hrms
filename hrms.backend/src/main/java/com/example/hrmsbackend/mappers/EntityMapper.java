@@ -2,7 +2,11 @@ package com.example.hrmsbackend.mappers;
 
 import com.example.hrmsbackend.dtos.request.EmployeeRequestDTO;
 import com.example.hrmsbackend.dtos.response.AuthEmployeeResponseDTO;
+import com.example.hrmsbackend.dtos.response.ManagerSummaryDTO;
+import com.example.hrmsbackend.dtos.response.RoleResponseDTO;
 import com.example.hrmsbackend.entities.Employee;
+import com.example.hrmsbackend.entities.EmployeeRole;
+import com.example.hrmsbackend.entities.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +28,33 @@ public class EntityMapper {
 
     public AuthEmployeeResponseDTO toAuthEmployeeResponseDTO(Employee employee) {
         if (employee == null) return null;
-        return modelMapper.map(employee, AuthEmployeeResponseDTO.class);
+        AuthEmployeeResponseDTO dto = modelMapper.map(employee, AuthEmployeeResponseDTO.class);
+        if (employee.getEmployeeRoles()!=null){
+            dto.setRoles(employee.getEmployeeRoles().stream().map(this::mapRole).toList());
+        }
+        return dto;
+    }
+
+    public ManagerSummaryDTO toManagerSummaryDTO(Employee employee) {
+        if (employee == null) return null;
+        return modelMapper.map(employee, ManagerSummaryDTO.class);
+    }
+
+    public RoleResponseDTO mapRole(EmployeeRole employeeRole) {
+        RoleResponseDTO role = new RoleResponseDTO();
+        role.setId(employeeRole.getRole().getId());
+        role.setName(employeeRole.getRole().getName());
+        return role;
+    }
+
+    public List<RoleResponseDTO> toRoleResponseDTOList(List<Role> roles) {
+        if (roles == null) return Collections.emptyList();
+        return roles.stream().map(this::toRoleResponseDTO).toList();
+    }
+
+    public RoleResponseDTO toRoleResponseDTO(Role role) {
+        if (role == null) return null;
+        return modelMapper.map(role, RoleResponseDTO.class);
     }
 //
 //    public EmployeeResponseDTO toEmployeeResponseDTO(Employee employee) {

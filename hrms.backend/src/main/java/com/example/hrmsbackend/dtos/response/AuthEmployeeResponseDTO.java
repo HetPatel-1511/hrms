@@ -28,9 +28,9 @@ public class AuthEmployeeResponseDTO {
 
     private Media profileMedia;
 
-    private AuthEmployeeResponseDTO manager;
+    private ManagerSummaryDTO manager;
 
-    private List<Role> roles;
+    private List<RoleResponseDTO> roles;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String accessToken;
@@ -126,19 +126,19 @@ public class AuthEmployeeResponseDTO {
         this.refreshToken = refreshToken;
     }
 
-    public AuthEmployeeResponseDTO getManager() {
+    public ManagerSummaryDTO getManager() {
         return manager;
     }
 
-    public void setManager(AuthEmployeeResponseDTO manager) {
+    public void setManager(ManagerSummaryDTO manager) {
         this.manager = manager;
     }
 
-    public List<Role> getRoles() {
+    public List<RoleResponseDTO> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(List<RoleResponseDTO> roles) {
         this.roles = roles;
     }
 }

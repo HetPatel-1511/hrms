@@ -61,8 +61,6 @@ public class AuthService {
         authEmployeeResponseDTO.setAccessToken(accessToken);
         authEmployeeResponseDTO.setRefreshToken(refreshToken);
 
-        authEmployeeResponseDTO.setRoles(employeeRoleRepo.findRoleNamesByEmployeeId(employee.getId()));
-
         return authEmployeeResponseDTO;
     }
 
@@ -88,7 +86,6 @@ public class AuthService {
         employee.setManager(manager);
         employeeRepo.save(employee);
 
-        AuthEmployeeResponseDTO authEmployeeResponseDTO = entityMapper.toAuthEmployeeResponseDTO(employee);
         for (Long roleId: employeeRequestDTO.getRoleIds()){
             Role role = roleRepo.findById(roleId).orElse(null);
             if (role==null) {
@@ -99,7 +96,8 @@ public class AuthService {
             employeeRole.setEmployee(employee);
             employeeRoleRepo.save(employeeRole);
         }
-        authEmployeeResponseDTO.setRoles(employeeRoleRepo.findRoleNamesByEmployeeId(employee.getId()));
+        AuthEmployeeResponseDTO authEmployeeResponseDTO = entityMapper.toAuthEmployeeResponseDTO(employee);
+        authEmployeeResponseDTO.setRoles(entityMapper.toRoleResponseDTOList(employeeRoleRepo.findRoleNamesByEmployeeId(employee.getId())));
         return authEmployeeResponseDTO;
     }
 
