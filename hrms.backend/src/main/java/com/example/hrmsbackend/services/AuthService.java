@@ -97,7 +97,7 @@ public class AuthService {
     private Employee getManager(Long id) {
         Employee manager = employeeRepo.findById(id).orElse(null);
         if (manager==null) {
-            throw new RuntimeException("Manager id not found");
+            throw new ResourceNotFoundException("Manager not found");
         }
         return manager;
     }
@@ -118,7 +118,7 @@ public class AuthService {
     private Designation getDesignation(EmployeeRequestDTO employeeRequestDTO) {
         Designation designation = designationRepo.findById(employeeRequestDTO.getDesignationId()).orElse(null);
         if (designation==null) {
-            throw new RuntimeException("Designation doesn't exist");
+            throw new ResourceNotFoundException("Designation doesn't exist");
         }
         return designation;
     }
@@ -144,7 +144,7 @@ public class AuthService {
 
         Employee employee = employeeRepo.findById(((Number) claims.get("id")).longValue()).orElse(null);
         if (employee==null){
-            throw new RuntimeException("Employee doesn't exist");
+            throw new ResourceNotFoundException("Employee doesn't exist");
         }
 
         Map<String, String> tokens = generateTokens(employee);

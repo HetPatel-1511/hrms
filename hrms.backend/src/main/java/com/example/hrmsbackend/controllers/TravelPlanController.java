@@ -4,9 +4,12 @@ import com.example.hrmsbackend.dtos.Create;
 import com.example.hrmsbackend.dtos.Update;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.TravelPlanRequestDTO;
+import com.example.hrmsbackend.dtos.response.ApiResponse;
 import com.example.hrmsbackend.dtos.response.TravelPlanResponseDTO;
 import com.example.hrmsbackend.services.TravelPlanService;
+import com.example.hrmsbackend.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,23 +29,23 @@ public class TravelPlanController {
     }
 
     @GetMapping
-    public List<TravelPlanResponseDTO> getAll() {
-        return travelPlanService.getAll();
+    public ResponseEntity<ApiResponse<List<TravelPlanResponseDTO>>> getAll() {
+        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.getAll(), "All travel plans fetched successfully", 200));
     }
 
     @PostMapping
-    public TravelPlanResponseDTO create(@RequestBody @Validated(Create.class) TravelPlanRequestDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return travelPlanService.create(dto, userDetails);
+    public ResponseEntity<ApiResponse<TravelPlanResponseDTO>> create(@RequestBody @Validated(Create.class) TravelPlanRequestDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.create(dto, userDetails), "Travel plan created successfully", 201));
     }
 
     @GetMapping("/{id}")
-    public TravelPlanResponseDTO getById(@PathVariable Long id) {
-        return travelPlanService.getById(id);
+    public ResponseEntity<ApiResponse<TravelPlanResponseDTO>> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.getById(id), "Travel plans with id " + id + " fetched successfully", 200));
     }
 
-    @PutMapping("/{id}")
-    public TravelPlanResponseDTO update(@PathVariable Long id, @RequestBody @Validated(Update.class) TravelPlanRequestDTO dto) {
-        return travelPlanService.update(id, dto);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<ApiResponse<TravelPlanResponseDTO>> update(@PathVariable Long id, @RequestBody @Validated(Update.class) TravelPlanRequestDTO dto) {
+//        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.update(id, dto), "Tokens refreshed successfully", 200));
+//    }
 
 }

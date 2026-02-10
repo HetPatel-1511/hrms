@@ -36,7 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthEmployeeResponseDTO login(@RequestBody @Validated(Login.class) EmployeeRequestDTO employeeRequestDTO, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<AuthEmployeeResponseDTO>> login(@RequestBody @Validated(Login.class) EmployeeRequestDTO employeeRequestDTO, HttpServletResponse response) {
         AuthEmployeeResponseDTO authEmployeeResponseDTO = authService.login(employeeRequestDTO);
 
         Cookie cookie1 = authService.newCookie("access_token", authEmployeeResponseDTO.getAccessToken(), accessTokenExpiration/1000, true, "/");
@@ -45,16 +45,16 @@ public class AuthController {
         Cookie cookie2 = authService.newCookie("refresh_token", authEmployeeResponseDTO.getRefreshToken(), refreshTokenExpiration/1000, true, "/");
         response.addCookie(cookie2);
 
-        return authEmployeeResponseDTO;
+        return ResponseEntity.ok(ResponseUtil.success(authEmployeeResponseDTO, "Logged in successfully", 200));
     }
 
     @PostMapping("/register")
-    public AuthEmployeeResponseDTO register(@RequestBody @Validated(Register.class) EmployeeRequestDTO employeeRequestDTO) {
-        return authService.register(employeeRequestDTO);
+    public ResponseEntity<ApiResponse<AuthEmployeeResponseDTO>> register(@RequestBody @Validated(Register.class) EmployeeRequestDTO employeeRequestDTO) {
+        return ResponseEntity.ok(ResponseUtil.success(authService.register(employeeRequestDTO), "Employee registered successfully", 201));
     }
 
     @PostMapping("/refresh-token")
-    public AuthEmployeeResponseDTO refreshToken(HttpServletResponse response, ServletRequest request) {
+    public ResponseEntity<ApiResponse<AuthEmployeeResponseDTO>> refreshToken(HttpServletResponse response, ServletRequest request) {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
         Cookie[] cookies = httpRequest.getCookies();
@@ -75,6 +75,6 @@ public class AuthController {
         Cookie cookie2 = authService.newCookie("refresh_token", authEmployeeResponseDTO.getRefreshToken(), refreshTokenExpiration/1000, true, "/");
         response.addCookie(cookie2);
 
-        return authEmployeeResponseDTO;
+        return ResponseEntity.ok(ResponseUtil.success(authEmployeeResponseDTO, "Tokens refreshed successfully", 200));
     }
 }

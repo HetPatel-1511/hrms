@@ -35,6 +35,8 @@ public class EmployeeRequestDTO {
 //    @NotNull(groups = {Register.class})
     private Long managerId;
 
+    private LocalDate birthDate;
+
     public String getName() {
         return name;
     }
@@ -89,5 +91,13 @@ public class EmployeeRequestDTO {
 
     public void setManagerId(Long managerId) {
         this.managerId = managerId;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 }

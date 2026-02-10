@@ -8,6 +8,7 @@ import com.example.hrmsbackend.dtos.response.TravelPlanResponseDTO;
 import com.example.hrmsbackend.entities.Employee;
 import com.example.hrmsbackend.entities.TravelPlan;
 import com.example.hrmsbackend.entities.TravelPlanEmployee;
+import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.EmployeeRepo;
 import com.example.hrmsbackend.repos.TravelPlanEmployeeRepo;
@@ -40,6 +41,9 @@ public class TravelPlanService {
 
     @Transactional
     public TravelPlanResponseDTO create(TravelPlanRequestDTO dto, CustomUserDetails userDetails) {
+        if (dto.getEndDate().isBefore(dto.getStartDate())){
+            throw new RuntimeException("Invalid start and end date");
+        }
         TravelPlan travelPlan = new TravelPlan();
         travelPlan.setPlace(dto.getPlace());
         travelPlan.setPurpose(dto.getPurpose());
@@ -61,7 +65,7 @@ public class TravelPlanService {
     public TravelPlanResponseDTO getById(Long id) {
         TravelPlan travelPlan = travelPlanRepo.findById(id).orElse(null);
         if (travelPlan == null) {
-            throw new RuntimeException("Travel plan with id " + id + " doesn't exist");
+            throw new ResourceNotFoundException("Travel plan with id " + id + " doesn't exist");
         }
         return entityMapper.toTravelPlanResponseDTO(travelPlan);
     }
@@ -69,7 +73,7 @@ public class TravelPlanService {
     public TravelPlanResponseDTO update(Long id, TravelPlanRequestDTO dto) {
         TravelPlan travelPlan = travelPlanRepo.findById(id).orElse(null);
         if (travelPlan == null) {
-            throw new RuntimeException("Travel plan with id " + id + " doesn't exist");
+            throw new ResourceNotFoundException("Travel plan with id " + id + " doesn't exist");
         }
         return entityMapper.toTravelPlanResponseDTO(travelPlan);
     }
