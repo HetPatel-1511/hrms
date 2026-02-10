@@ -35,9 +35,11 @@ class TravelDocument {
     private Employee uploadedBy;
 
     @NotBlank
+    @Column(name = "owner_type")
     private String ownerType;
 
     @NotNull
+    @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt;
 
     public Long getId() {

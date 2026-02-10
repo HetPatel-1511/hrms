@@ -26,6 +26,7 @@ public class EmployeeRole {
     private Role role;
 
     @NotNull
+    @Column(name = "assigned_at")
     private LocalDateTime assignedAt = LocalDateTime.now();
 
     public Long getId() {

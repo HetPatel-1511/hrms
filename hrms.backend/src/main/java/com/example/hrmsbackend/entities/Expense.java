@@ -31,8 +31,10 @@ class Expense {
     private String remarks;
 
     @NotNull
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
     @NotNull

@@ -15,12 +15,15 @@ public class Media {
     private Long id;
 
     @NotBlank
+    @Column(name = "mime_type")
     private String mimeType;
 
     @NotBlank
+    @Column(name = "original_name")
     private String originalName;
 
     @NotBlank
+    @Column(name = "file_name")
     private String fileName;
 
     @NotBlank
@@ -32,9 +35,11 @@ public class Media {
     private Employee uploadedBy;
 
     @NotNull
+    @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
 
     @NotNull
+    @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
     public Long getId() {

@@ -21,13 +21,16 @@ public class TravelPlan {
     private String purpose;
 
     @NotNull
+    @Column(name = "start_date")
     private LocalDate startDate;
 
     @NotNull
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @NotNull
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @NotNull
     @ManyToOne
