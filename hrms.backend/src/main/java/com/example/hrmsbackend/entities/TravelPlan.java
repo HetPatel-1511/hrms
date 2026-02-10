@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.time.*;
+import java.util.List;
 
 @Entity
 @Table(name = "travel_plans")
@@ -36,6 +37,9 @@ public class TravelPlan {
     @ManyToOne
     @JoinColumn(name = "fk_created_by", nullable = false)
     private Employee createdBy;
+
+    @OneToMany(mappedBy = "travelPlan")
+    private List<TravelPlanEmployee> travelPlanEmployees;
 
     public Long getId() {
         return id;
@@ -87,5 +91,13 @@ public class TravelPlan {
 
     public void setCreatedBy(Employee createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public List<TravelPlanEmployee> getTravelPlanEmployees() {
+        return travelPlanEmployees;
+    }
+
+    public void setTravelPlanEmployees(List<TravelPlanEmployee> travelPlanEmployees) {
+        this.travelPlanEmployees = travelPlanEmployees;
     }
 }

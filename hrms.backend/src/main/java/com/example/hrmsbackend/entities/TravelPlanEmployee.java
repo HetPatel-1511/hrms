@@ -22,7 +22,6 @@ public class TravelPlanEmployee {
     @JoinColumn(name = "fk_travel_plan_id", nullable = false)
     private TravelPlan travelPlan;
 
-    @Positive
     @Column(name = "max_amount_per_day")
     private Integer maxAmountPerDay;
 

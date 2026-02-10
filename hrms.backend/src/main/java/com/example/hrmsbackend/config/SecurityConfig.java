@@ -20,16 +20,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Autowired
-    private final JwtAuthFilter jwtAuthFilter;
-    @Autowired
-    private final PasswordEncoder passwordEncoder;
+    private JwtAuthFilter jwtAuthFilter;
+    private PasswordEncoder passwordEncoder;
 
-    private static final String[] WHITE_LIST_URL = {
+    public static final String[] WHITE_LIST_URL = {
             "/auth/login",
             "/auth/register",
             "/auth/refresh-token"
     };
+
+    @Autowired
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, PasswordEncoder passwordEncoder) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

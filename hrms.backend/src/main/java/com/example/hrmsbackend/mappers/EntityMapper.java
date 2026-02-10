@@ -1,26 +1,26 @@
 package com.example.hrmsbackend.mappers;
 
 import com.example.hrmsbackend.dtos.request.EmployeeRequestDTO;
-import com.example.hrmsbackend.dtos.response.AuthEmployeeResponseDTO;
-import com.example.hrmsbackend.dtos.response.ManagerSummaryDTO;
-import com.example.hrmsbackend.dtos.response.RoleResponseDTO;
-import com.example.hrmsbackend.entities.Employee;
-import com.example.hrmsbackend.entities.EmployeeRole;
-import com.example.hrmsbackend.entities.Role;
+import com.example.hrmsbackend.dtos.response.*;
+import com.example.hrmsbackend.entities.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class EntityMapper {
 
-    @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    public EntityMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+
+    //  Employees
     public Employee toEmployee(EmployeeRequestDTO employee) {
         if (employee == null) return null;
         return modelMapper.map(employee, Employee.class);
@@ -35,11 +35,17 @@ public class EntityMapper {
         return dto;
     }
 
-    public ManagerSummaryDTO toManagerSummaryDTO(Employee employee) {
+    public EmployeeSummaryDTO toEmployeeSummaryDTO(Employee employee) {
         if (employee == null) return null;
-        return modelMapper.map(employee, ManagerSummaryDTO.class);
+        return modelMapper.map(employee, EmployeeSummaryDTO.class);
     }
 
+    public List<EmployeeSummaryDTO> toEmployeeSummaryDTOList(List<Employee> employees) {
+        if (employees == null) return Collections.emptyList();
+        return employees.stream().map(this::toEmployeeSummaryDTO).toList();
+    }
+
+    //  Roles
     public RoleResponseDTO mapRole(EmployeeRole employeeRole) {
         RoleResponseDTO role = new RoleResponseDTO();
         role.setId(employeeRole.getRole().getId());
@@ -56,59 +62,25 @@ public class EntityMapper {
         if (role == null) return null;
         return modelMapper.map(role, RoleResponseDTO.class);
     }
-//
-//    public EmployeeResponseDTO toEmployeeResponseDTO(Employee employee) {
-//        if (employee == null) return null;
-//        return modelMapper.map(employee, EmployeeResponseDTO.class);
-//    }
-//
-//    public AuthEmployeeResponseDTO toAuthEmployeeResponseDTO(Employee employee) {
-//        if (employee == null) return null;
-//        return modelMapper.map(employee, AuthEmployeeResponseDTO.class);
-//    }
-//
-//    public List<EmployeeResponseDTO> toEmployeeResponseDTOList(List<Employee> list) {
-//        if (list == null) return Collections.emptyList();
-//        return list.stream().map(this::toEmployeeResponseDTO).collect(Collectors.toList());
-//    }
-//
-//    public Library toLibrary(LibraryDTO dto) {
-//        if (dto == null) return null;
-//        return modelMapper.map(dto, Library.class);
-//    }
-//
-//    public List<LibraryDTO> toLibraryDTOList(List<Library> list) {
-//        if (list == null) return Collections.emptyList();
-//        return list.stream().map(this::toLibraryDTO).collect(Collectors.toList());
-//    }
-//
-//    public BookDTO toBookDTO(Book book) {
-//        if (book == null) return null;
-//        BookDTO dto = modelMapper.map(book, BookDTO.class);
-//        if (book.getLibrary() != null) dto.setLibraryId(book.getLibrary().getId());
-//        if (book.getAuthors() != null) {
-//            dto.setAuthorIds(book.getAuthors().stream().map(Author::getId).collect(Collectors.toList()));
-//        }
-//        return dto;
-//    }
-//
-//    public List<BookDTO> toBookDTOList(List<Book> books) {
-//        if (books == null) return Collections.emptyList();
-//        return books.stream().map(this::toBookDTO).collect(Collectors.toList());
-//    }
-//
-//    public AuthorDTO toAuthorDTO(Author author) {
-//        if (author == null) return null;
-//        return modelMapper.map(author, AuthorDTO.class);
-//    }
-//
-//    public Author toAuthor(AuthorDTO dto) {
-//        if (dto == null) return null;
-//        return modelMapper.map(dto, Author.class);
-//    }
-//
-//    public List<AuthorDTO> toAuthorDTOList(List<Author> list) {
-//        if (list == null) return Collections.emptyList();
-//        return list.stream().map(this::toAuthorDTO).collect(Collectors.toList());
-//    }
+
+    // Travel Plan
+    public TravelPlanResponseDTO toTravelPlanResponseDTO(TravelPlan travelPlan) {
+        if (travelPlan == null) return null;
+        TravelPlanResponseDTO dto = modelMapper.map(travelPlan, TravelPlanResponseDTO.class);
+        if (travelPlan.getTravelPlanEmployees() != null) {
+            dto.setTravellingEmployees(travelPlan.getTravelPlanEmployees().stream().map(this::mapTravellingEmployees).toList());
+        }
+        return dto;
+    }
+
+    public EmployeeSummaryDTO mapTravellingEmployees(TravelPlanEmployee travelPlanEmployee) {
+        EmployeeSummaryDTO dto = this.toEmployeeSummaryDTO(travelPlanEmployee.getEmployee());
+        dto.setMaxAmountPerDay(travelPlanEmployee.getMaxAmountPerDay());
+        return dto;
+    }
+
+    public List<TravelPlanResponseDTO> toTravelPlanResponseDTOList(List<TravelPlan> travelPlans) {
+        if (travelPlans == null) return Collections.emptyList();
+        return travelPlans.stream().map(this::toTravelPlanResponseDTO).toList();
+    }
 }

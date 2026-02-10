@@ -6,6 +6,7 @@ import com.example.hrmsbackend.entities.Designation;
 import com.example.hrmsbackend.entities.Employee;
 import com.example.hrmsbackend.entities.EmployeeRole;
 import com.example.hrmsbackend.entities.Role;
+import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.DesignationRepo;
 import com.example.hrmsbackend.repos.EmployeeRepo;
@@ -13,6 +14,7 @@ import com.example.hrmsbackend.repos.EmployeeRoleRepo;
 import com.example.hrmsbackend.repos.RoleRepo;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,7 +48,7 @@ public class AuthService {
     public AuthEmployeeResponseDTO login(EmployeeRequestDTO employeeRequestDTO) {
         Employee employee = employeeRepo.findByEmail(employeeRequestDTO.getEmail());
         if (employee==null){
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         if (!passwordEncoder.matches(employeeRequestDTO.getPassword(), employee.getPassword())){
@@ -73,20 +75,35 @@ public class AuthService {
         employeeRequestDTO.setPassword(passwordEncoder.encode(employeeRequestDTO.getPassword()));
         Employee employee = entityMapper.toEmployee(employeeRequestDTO);
 
-        Designation designation = designationRepo.findById(employeeRequestDTO.getDesignationId()).orElse(null);
-        if (designation==null) {
-            throw new RuntimeException("Employee with this email already exist");
-        }
+        Designation designation = getDesignation(employeeRequestDTO);
         employee.setDesignation(designation);
 
-        Employee manager = employeeRepo.findById(employeeRequestDTO.getManagerId()).orElse(null);
+        Long managerId = employeeRequestDTO.getManagerId();
+        if (managerId != null) {
+            Employee manager = getManager(managerId);
+            employee.setManager(manager);
+        }
+
+        employeeRepo.save(employee);
+
+        setEmployeeRoles(employeeRequestDTO.getRoleIds(), employee);
+
+        AuthEmployeeResponseDTO authEmployeeResponseDTO = entityMapper.toAuthEmployeeResponseDTO(employee);
+        authEmployeeResponseDTO.setRoles(entityMapper.toRoleResponseDTOList(employeeRoleRepo.findRoleNamesByEmployeeId(employee.getId())));
+
+        return authEmployeeResponseDTO;
+    }
+
+    private Employee getManager(Long id) {
+        Employee manager = employeeRepo.findById(id).orElse(null);
         if (manager==null) {
             throw new RuntimeException("Manager id not found");
         }
-        employee.setManager(manager);
-        employeeRepo.save(employee);
+        return manager;
+    }
 
-        for (Long roleId: employeeRequestDTO.getRoleIds()){
+    private void setEmployeeRoles(List<Long> roleIds, Employee employee) {
+        for (Long roleId: roleIds){
             Role role = roleRepo.findById(roleId).orElse(null);
             if (role==null) {
                 continue;
@@ -96,9 +113,14 @@ public class AuthService {
             employeeRole.setEmployee(employee);
             employeeRoleRepo.save(employeeRole);
         }
-        AuthEmployeeResponseDTO authEmployeeResponseDTO = entityMapper.toAuthEmployeeResponseDTO(employee);
-        authEmployeeResponseDTO.setRoles(entityMapper.toRoleResponseDTOList(employeeRoleRepo.findRoleNamesByEmployeeId(employee.getId())));
-        return authEmployeeResponseDTO;
+    }
+
+    private Designation getDesignation(EmployeeRequestDTO employeeRequestDTO) {
+        Designation designation = designationRepo.findById(employeeRequestDTO.getDesignationId()).orElse(null);
+        if (designation==null) {
+            throw new RuntimeException("Designation doesn't exist");
+        }
+        return designation;
     }
 
     public Map<String, String> generateTokens(Employee employee) {

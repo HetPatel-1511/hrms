@@ -2,8 +2,6 @@ package com.example.hrmsbackend.dtos.response;
 
 import com.example.hrmsbackend.entities.*;
 import com.fasterxml.jackson.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,7 +26,7 @@ public class AuthEmployeeResponseDTO {
 
     private Media profileMedia;
 
-    private ManagerSummaryDTO manager;
+    private EmployeeSummaryDTO manager;
 
     private List<RoleResponseDTO> roles;
 
@@ -126,11 +124,11 @@ public class AuthEmployeeResponseDTO {
         this.refreshToken = refreshToken;
     }
 
-    public ManagerSummaryDTO getManager() {
+    public EmployeeSummaryDTO getManager() {
         return manager;
     }
 
-    public void setManager(ManagerSummaryDTO manager) {
+    public void setManager(EmployeeSummaryDTO manager) {
         this.manager = manager;
     }
 

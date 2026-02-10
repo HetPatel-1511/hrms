@@ -32,7 +32,7 @@ public class EmployeeRequestDTO {
     @NotNull(groups = {Register.class})
     private List<Long> roleIds;
 
-    @NotNull(groups = {Register.class})
+//    @NotNull(groups = {Register.class})
     private Long managerId;
 
     public String getName() {
