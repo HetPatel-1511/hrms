@@ -99,6 +99,16 @@ public class EntityMapper {
         return travelDocuments.stream().map(this::toTravelDocumentResponseDTO).toList();
     }
 
+    public DocumentTypeResponseDTO toDocumentTypeResponseDTO(DocumentType documentType) {
+        if (documentType == null) return null;
+        return modelMapper.map(documentType, DocumentTypeResponseDTO.class);
+    }
+
+    public List<DocumentTypeResponseDTO> toDocumentTypeResponseDTOList(List<DocumentType> documentTypes) {
+        if (documentTypes == null) return Collections.emptyList();
+        return documentTypes.stream().map(this::toDocumentTypeResponseDTO).toList();
+    }
+
     public MediaResponseDTO toMediaResponseDTO(Media media) {
         if (media == null) return null;
         return modelMapper.map(media, MediaResponseDTO.class);
