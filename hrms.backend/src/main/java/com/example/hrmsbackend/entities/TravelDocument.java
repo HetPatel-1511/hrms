@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "travel_documents")
-class TravelDocument {
+public class TravelDocument {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,18 +29,13 @@ class TravelDocument {
     @JoinColumn(name = "fk_document_type_id", nullable = false)
     private DocumentType documentType;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "fk_uploaded_by_id", nullable = false)
-    private Employee uploadedBy;
-
     @NotBlank
     @Column(name = "owner_type")
     private String ownerType;
 
     @NotNull
     @Column(name = "uploaded_at")
-    private LocalDateTime uploadedAt;
+    private LocalDateTime uploadedAt = LocalDateTime.now();
 
     public Long getId() {
         return id;
@@ -68,15 +63,7 @@ class TravelDocument {
 
     public void setDocumentType(DocumentType documentType) {
         this.documentType = documentType;
-    }
-
-    public Employee getUploadedBy() {
-        return uploadedBy;
-    }
-
-    public void setUploadedBy(Employee uploadedBy) {
-        this.uploadedBy = uploadedBy;
-    }
+}
 
     public String getOwnerType() {
         return ownerType;

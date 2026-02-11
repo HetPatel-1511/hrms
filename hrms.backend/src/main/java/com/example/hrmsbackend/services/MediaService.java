@@ -3,9 +3,11 @@ package com.example.hrmsbackend.services;
 import com.example.hrmsbackend.entities.Employee;
 import com.example.hrmsbackend.entities.Media;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
+import com.example.hrmsbackend.repos.EmployeeRepo;
 import com.example.hrmsbackend.repos.MediaRepo;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,19 +18,29 @@ import java.util.UUID;
 public class MediaService {
     private S3FileService s3FileService;
     private MediaRepo mediaRepo;
+    private EmployeeRepo employeeRepo;
 
     @Autowired
-    public MediaService(S3FileService s3FileService, MediaRepo mediaRepo) {
+    public MediaService(S3FileService s3FileService, MediaRepo mediaRepo, EmployeeRepo employeeRepo) {
         this.s3FileService = s3FileService;
         this.mediaRepo = mediaRepo;
+        this.employeeRepo = employeeRepo;
     }
 
     @Transactional
-    public Media upload(MultipartFile file, String fileRole, Employee uploadedBy) {
+    public Media upload(MultipartFile file, String fileRole, UserDetails userDetails) {
         FileDetails fileDetails = getFileDetails(file, fileRole);
         String url = s3FileService.uploadFile(file, fileDetails.key());
+
+        Employee uploadedBy = getEmployee(userDetails);
+
         Media media = saveMedia(uploadedBy, fileDetails, url);
         return media;
+    }
+
+    private Employee getEmployee(UserDetails userDetails) {
+        Employee uploadedBy = employeeRepo.findByEmail(userDetails.getUsername());
+        return uploadedBy;
     }
 
     @Transactional

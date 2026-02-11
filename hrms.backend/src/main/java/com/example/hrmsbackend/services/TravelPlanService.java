@@ -4,18 +4,19 @@ import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.TravelPlanRequestDTO;
 import com.example.hrmsbackend.dtos.request.TravelingEmployeeRequestDTO;
 import com.example.hrmsbackend.dtos.response.EmployeeSummaryDTO;
+import com.example.hrmsbackend.dtos.response.TravelDocumentResponseDTO;
 import com.example.hrmsbackend.dtos.response.TravelPlanResponseDTO;
-import com.example.hrmsbackend.entities.Employee;
-import com.example.hrmsbackend.entities.TravelPlan;
-import com.example.hrmsbackend.entities.TravelPlanEmployee;
+import com.example.hrmsbackend.entities.*;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
-import com.example.hrmsbackend.repos.EmployeeRepo;
-import com.example.hrmsbackend.repos.TravelPlanEmployeeRepo;
-import com.example.hrmsbackend.repos.TravelPlanRepo;
+import com.example.hrmsbackend.repos.*;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +27,19 @@ public class TravelPlanService {
     private EmployeeRepo employeeRepo;
     private TravelPlanEmployeeRepo travelPlanEmployeeRepo;
     private EntityMapper entityMapper;
+    private DocumentTypeRepo documentTypeRepo;
+    private MediaService mediaService;
+    private TravelDocumentRepo travelDocumentRepo;
 
     @Autowired
-    public TravelPlanService(TravelPlanRepo travelPlanRepo, EmployeeRepo employeeRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, EntityMapper entityMapper) {
+    public TravelPlanService(TravelPlanRepo travelPlanRepo, EmployeeRepo employeeRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, EntityMapper entityMapper, DocumentTypeRepo documentTypeRepo, MediaService mediaService, TravelDocumentRepo travelDocumentRepo) {
         this.travelPlanRepo = travelPlanRepo;
         this.employeeRepo = employeeRepo;
         this.travelPlanEmployeeRepo = travelPlanEmployeeRepo;
         this.entityMapper = entityMapper;
+        this.documentTypeRepo = documentTypeRepo;
+        this.mediaService = mediaService;
+        this.travelDocumentRepo = travelDocumentRepo;
     }
 
     public List<TravelPlanResponseDTO> getAll() {
@@ -101,5 +108,58 @@ public class TravelPlanService {
             employeeSummaryDTOs.add(employeeSummaryDTO);
         }
         return employeeSummaryDTOs;
+    }
+
+    public TravelDocumentResponseDTO uploadDocument(Long travelPlanId, Long employeeId, Long documentTypeId, MultipartFile file, String ownerType, CustomUserDetails userDetails) {
+        TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(travelPlanId, employeeId);
+        DocumentType documentType = getDocumentType(documentTypeId);
+
+        Media media = mediaService.upload(file, documentType.getName(), userDetails);
+
+        TravelDocument travelDocument = getTravelDocument(ownerType, documentType, travelPlanEmployee, media);
+        travelDocumentRepo.save(travelDocument);
+
+        return entityMapper.toTravelDocumentResponseDTO(travelDocument);
+    }
+
+    private static @NonNull TravelDocument getTravelDocument(String ownerType, DocumentType documentType, TravelPlanEmployee travelPlanEmployee, Media media) {
+        TravelDocument travelDocument = new TravelDocument();
+
+        travelDocument.setDocumentType(documentType);
+        travelDocument.setTravelPlanEmployee(travelPlanEmployee);
+        travelDocument.setMedia(media);
+        travelDocument.setOwnerType(ownerType);
+
+        return travelDocument;
+    }
+
+    private @NonNull DocumentType getDocumentType(Long id) {
+        DocumentType documentType = documentTypeRepo.findById(id).orElse(null);
+        if (documentType == null) {
+            throw new ResourceNotFoundException("Document with id " + id + " doesn't exist");
+        }
+        return documentType;
+    }
+
+    private @Nullable TravelPlanEmployee getTravelPlanEmployee(Long travelPlanId, Long employeeId) {
+        TravelPlanEmployee travelPlanEmployee = new TravelPlanEmployee();
+        travelPlanEmployee.setEmployee(employeeRepo.findById(employeeId).orElse(null));
+        travelPlanEmployee.setTravelPlan(travelPlanRepo.findById(travelPlanId).orElse(null));
+
+        Example<TravelPlanEmployee> example = Example.of(travelPlanEmployee);
+
+        TravelPlanEmployee travelPlanEmployee1 = travelPlanEmployeeRepo.findOne(example).orElse(null);
+        if (travelPlanEmployee1 == null) {
+            throw new ResourceNotFoundException("Travel plan doesn't exist");
+        }
+        return travelPlanEmployee1;
+    }
+
+    public List<TravelDocumentResponseDTO> getDocuments(Long travelPlanId, Long employeeId) {
+        TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(travelPlanId, employeeId);
+
+        List<TravelDocument> travelDocuments = travelDocumentRepo.findAllByTravelPlanEmployeeId(travelPlanEmployee.getId());
+
+        return entityMapper.toTravelDocumentResponseDTOList(travelDocuments);
     }
 }

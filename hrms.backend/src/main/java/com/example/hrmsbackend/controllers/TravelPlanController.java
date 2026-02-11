@@ -5,16 +5,20 @@ import com.example.hrmsbackend.dtos.Update;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.TravelPlanRequestDTO;
 import com.example.hrmsbackend.dtos.response.ApiResponse;
+import com.example.hrmsbackend.dtos.response.TravelDocumentResponseDTO;
 import com.example.hrmsbackend.dtos.response.TravelPlanResponseDTO;
 import com.example.hrmsbackend.services.TravelPlanService;
 import com.example.hrmsbackend.utils.ResponseUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -48,4 +52,23 @@ public class TravelPlanController {
 //        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.update(id, dto), "Tokens refreshed successfully", 200));
 //    }
 
+    @GetMapping(value = "/{travelPlanId}/employee/{employeeId}/documents")
+    public ResponseEntity<ApiResponse<List<TravelDocumentResponseDTO>>> getDocuments(
+            @PathVariable("travelPlanId") Long travelPlanId,
+            @PathVariable("employeeId") Long employeeId
+    ) {
+        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.getDocuments(travelPlanId, employeeId), "Document fetched successfully", 200));
+    }
+
+    @PostMapping(value = "/{travelPlanId}/employee/{employeeId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<TravelDocumentResponseDTO>> uploadDocument(
+            @PathVariable("travelPlanId") Long travelPlanId,
+            @PathVariable("employeeId") Long employeeId,
+            @RequestPart("documentTypeId") String documentTypeId,
+            @RequestPart("ownerType") String ownerType,
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.uploadDocument(travelPlanId, employeeId, Long.parseLong(documentTypeId), file, ownerType, userDetails), "Document uploaded successfully", 201));
+    }
 }

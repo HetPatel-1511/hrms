@@ -3,6 +3,7 @@ package com.example.hrmsbackend.filters;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.services.CustomUserDetailsService;
 import com.example.hrmsbackend.services.JwtService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -10,13 +11,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.hrmsbackend.config.SecurityConfig.WHITE_LIST_URL;
 
@@ -42,10 +46,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         if (token != "" && token != null) {
             if (!jwtService.isExpired(token)) {
-                Object userName = jwtService.extractAllClaims(token).get("email");
+                Claims claims = jwtService.extractAllClaims(token);
+                Object userName = claims.get("email");
+                Collection<String> roles = (Collection<String>) claims.get("roles");
+
                 CustomUserDetails user = (CustomUserDetails) customUserDetailsService.loadUserByUsername((String) userName);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                         user, null, List.of());
+                         user, null, roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }

@@ -45,6 +45,11 @@ public class EntityMapper {
         return employees.stream().map(this::toEmployeeSummaryDTO).toList();
     }
 
+    public List<AuthEmployeeResponseDTO> toAuthEmployeeResponseDTOList(List<Employee> employees) {
+        if (employees == null) return Collections.emptyList();
+        return employees.stream().map(this::toAuthEmployeeResponseDTO).toList();
+    }
+
     //  Roles
     public RoleResponseDTO mapRole(EmployeeRole employeeRole) {
         RoleResponseDTO role = new RoleResponseDTO();
@@ -82,5 +87,20 @@ public class EntityMapper {
     public List<TravelPlanResponseDTO> toTravelPlanResponseDTOList(List<TravelPlan> travelPlans) {
         if (travelPlans == null) return Collections.emptyList();
         return travelPlans.stream().map(this::toTravelPlanResponseDTO).toList();
+    }
+
+    public TravelDocumentResponseDTO toTravelDocumentResponseDTO(TravelDocument travelDocument) {
+        if (travelDocument == null) return null;
+        return modelMapper.map(travelDocument, TravelDocumentResponseDTO.class);
+    }
+
+    public List<TravelDocumentResponseDTO> toTravelDocumentResponseDTOList(List<TravelDocument> travelDocuments) {
+        if (travelDocuments == null) return Collections.emptyList();
+        return travelDocuments.stream().map(this::toTravelDocumentResponseDTO).toList();
+    }
+
+    public MediaResponseDTO toMediaResponseDTO(Media media) {
+        if (media == null) return null;
+        return modelMapper.map(media, MediaResponseDTO.class);
     }
 }

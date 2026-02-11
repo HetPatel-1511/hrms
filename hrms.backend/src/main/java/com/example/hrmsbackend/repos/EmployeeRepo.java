@@ -16,4 +16,7 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
     boolean existsByEmail(String email);
     Employee findByName(String name);
     Employee findByEmail(String email);
+
+    @Query("SELECT r.name FROM Employee e JOIN e.employeeRoles er JOIN er.role r WHERE e.id = :employeeId")
+    List<String> findRolesByEmployeeId(@Param("employeeId") Long employeeId);
 }

@@ -41,7 +41,7 @@ public class Media {
 
     @NotNull
     @Column(name = "uploaded_at", nullable = false)
-    private LocalDateTime uploadedAt;
+    private LocalDateTime uploadedAt = LocalDateTime.now();
 
     @NotNull
     @Column(name = "is_deleted", nullable = false)
