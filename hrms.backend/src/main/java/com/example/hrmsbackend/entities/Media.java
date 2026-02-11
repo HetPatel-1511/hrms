@@ -2,13 +2,14 @@ package com.example.hrmsbackend.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "media")
+@Where(clause = "is_deleted = false")
 public class Media {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_media_id")
@@ -27,6 +28,10 @@ public class Media {
     private String fileName;
 
     @NotBlank
+    @Column(name = "file_key")
+    private String fileKey;
+
+    @NotBlank
     private String url;
 
     @NotNull
@@ -40,7 +45,7 @@ public class Media {
 
     @NotNull
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
     public Long getId() {
         return id;
@@ -100,5 +105,13 @@ public class Media {
 
     public void setIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public String getFileKey() {
+        return fileKey;
+    }
+
+    public void setFileKey(String fileKey) {
+        this.fileKey = fileKey;
     }
 }
