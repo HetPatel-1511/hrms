@@ -2,7 +2,8 @@ import axios from "axios"
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000
+  timeout: 10000,
+  withCredentials: true
 });
 
 instance.interceptors.request.use(
@@ -25,4 +26,4 @@ instance.interceptors.response.use(
   },
 );
 
-export default axios;
+export default instance;
