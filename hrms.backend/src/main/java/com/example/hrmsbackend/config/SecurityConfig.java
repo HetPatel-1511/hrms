@@ -1,6 +1,7 @@
 package com.example.hrmsbackend.config;
 
 import com.example.hrmsbackend.filters.JwtAuthFilter;
+import com.example.hrmsbackend.utils.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private JwtAuthFilter jwtAuthFilter;
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private PasswordEncoder passwordEncoder;
 
     public static final String[] WHITE_LIST_URL = {
@@ -31,8 +33,9 @@ public class SecurityConfig {
     };
 
     @Autowired
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter, PasswordEncoder passwordEncoder) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, PasswordEncoder passwordEncoder) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -46,6 +49,9 @@ public class SecurityConfig {
                     .anyRequest().authenticated())
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exceptionHandling ->
+                    exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
+            )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
