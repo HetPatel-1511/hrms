@@ -22,7 +22,8 @@ const SidebarListButton = ({ data }: { data: MenuItem }) => {
         <>
             {data?.isDropdown ?
                 <>
-                    <button
+                    <Link
+                    to={data.href ? data.href : "/"}
                         type="button"
                         className="flex items-center p-2 w-full cursor-pointer text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                         aria-controls="dropdown-sales"
@@ -45,7 +46,7 @@ const SidebarListButton = ({ data }: { data: MenuItem }) => {
                                 clip-rule="evenodd"
                             ></path>
                         </svg>
-                    </button>
+                    </Link>
                     <ul id="dropdown-sales" className={`${!dropdownVisible && "hidden"} py-2 space-y-2`}>
                         {data.dropdown?.map((d, i) =>
                             <li>

@@ -1,28 +1,26 @@
 import React, { useState } from 'react'
 import SidebarListButton from './SidebarListButton'
-import { ArrowRightEndOnRectangleIcon, CameraIcon } from '@heroicons/react/24/solid'
+import { ArrowRightEndOnRectangleIcon, CameraIcon, HomeIcon } from '@heroicons/react/24/solid'
+import { href } from 'react-router'
 
 const Sidebar = React.memo(() => {
     const sidebarList = [
         {
-            title: "Travel Plan",
+            title: "Home",
             isDropdown: false,
-            href: "/travel-plan",
-            Icon: <CameraIcon className='h-6 w-6' />
+            href: "/",
+            Icon: <HomeIcon className='h-6 w-6' />
         },
         {
-            title: "Dropdown",
+            title: "Travel Plan",
             isDropdown: true,
-            Icon: <ArrowRightEndOnRectangleIcon className='h-6 w-6' />,
+            Icon: <CameraIcon className='h-6 w-6' />,
+            href: "/travel-plan",
             dropdown: [
                 {
-                    title: "d1",
-                    href: "/d1"
-                },
-                {
-                    title: "d2",
-                    href: "/d2"
-                },
+                    title: "Add New",
+                    href: "travel-plan/add"
+                }
             ]
         }
     ]

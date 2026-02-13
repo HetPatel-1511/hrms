@@ -4,6 +4,8 @@ import AuthLayout from "../components/AuthLayout";
 import Login from "../pages/Login";
 import TravelPlan from "../pages/TravelPlan";
 import AddTravelPlan from "../pages/AddTravelPlan";
+import SingleTravelPlan from "../pages/SingleTravelPlan";
+import TravelPlanEmployeeDocuments from "../pages/TravelPlanEmployeeDocuments";
 
 export default [
     {
@@ -20,6 +22,14 @@ export default [
                     {
                         path: "add",
                         element: <AddTravelPlan />,
+                    },
+                    {
+                        path: ":travelPlanId",
+                        element: <SingleTravelPlan />,
+                    },
+                    {
+                        path: ":travelPlanId/employee/:employeeId/documents",
+                        element: <TravelPlanEmployeeDocuments />,
                     },
                 ]
             },
