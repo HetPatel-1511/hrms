@@ -1,61 +1,41 @@
-package com.example.hrmsbackend.entities;
+package com.example.hrmsbackend.dtos.response;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "expenses")
-public class Expense {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pk_expense_id")
+public class ExpenseResponseDTO {
     private Long id;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "fk_expense_media_id", nullable = false)
-    private Media expenseMedia;
-
-    @Positive
     private Integer amount;
 
-    @NotBlank
     private String description;
 
-    @NotBlank
     private String status;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String remarks;
 
-    @NotNull
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
-    @Column(name = "approved_at")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime approvedAt;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "fk_travel_plan_employee_id", nullable = false)
-    private TravelPlanEmployee travelPlanEmployee;
+    private MediaResponseDTO expenseMedia;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_status_changed_by")
-    private Employee statusChangedBy;
+    private EmployeeSummaryDTO employee;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private EmployeeSummaryDTO statusChangedBy;
+
+    private TravelPlanSummaryResponseDTO travelPlan;
 
     public Long getId() {
         return id;
     }
 
-    public Media getExpenseMedia() {
-        return expenseMedia;
-    }
-
-    public void setExpenseMedia(Media expenseMedia) {
-        this.expenseMedia = expenseMedia;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getAmount() {
@@ -106,19 +86,35 @@ public class Expense {
         this.approvedAt = approvedAt;
     }
 
-    public TravelPlanEmployee getTravelPlanEmployee() {
-        return travelPlanEmployee;
+    public MediaResponseDTO getExpenseMedia() {
+        return expenseMedia;
     }
 
-    public void setTravelPlanEmployee(TravelPlanEmployee travelPlanEmployee) {
-        this.travelPlanEmployee = travelPlanEmployee;
+    public void setExpenseMedia(MediaResponseDTO expenseMedia) {
+        this.expenseMedia = expenseMedia;
     }
 
-    public Employee getStatusChangedBy() {
+    public EmployeeSummaryDTO getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(EmployeeSummaryDTO employee) {
+        this.employee = employee;
+    }
+
+    public EmployeeSummaryDTO getStatusChangedBy() {
         return statusChangedBy;
     }
 
-    public void setStatusChangedBy(Employee statusChangedBy) {
+    public void setStatusChangedBy(EmployeeSummaryDTO statusChangedBy) {
         this.statusChangedBy = statusChangedBy;
+    }
+
+    public TravelPlanSummaryResponseDTO getTravelPlan() {
+        return travelPlan;
+    }
+
+    public void setTravelPlan(TravelPlanSummaryResponseDTO travelPlan) {
+        this.travelPlan = travelPlan;
     }
 }

@@ -113,4 +113,14 @@ public class EntityMapper {
         if (media == null) return null;
         return modelMapper.map(media, MediaResponseDTO.class);
     }
+
+    public ExpenseResponseDTO toExpenseResponseDTO(Expense expense) {
+        if (expense == null) return null;
+        return modelMapper.map(expense, ExpenseResponseDTO.class);
+    }
+
+    public List<ExpenseResponseDTO> toExpenseResponseDTOList(List<Expense> expenses) {
+        if (expenses == null) return Collections.emptyList();
+        return expenses.stream().map(this::toExpenseResponseDTO).toList();
+    }
 }
