@@ -1,5 +1,6 @@
 package com.example.hrmsbackend.mappers;
 
+import com.example.hrmsbackend.dtos.request.ConfigurationRequestDTO;
 import com.example.hrmsbackend.dtos.request.EmployeeRequestDTO;
 import com.example.hrmsbackend.dtos.response.*;
 import com.example.hrmsbackend.entities.*;
@@ -166,5 +167,20 @@ public class EntityMapper {
     public List<ExpenseResponseDTO> toExpenseResponseDTOList(List<Expense> expenses) {
         if (expenses == null) return Collections.emptyList();
         return expenses.stream().map(this::toExpenseResponseDTO).toList();
+    }
+
+    public Configuration toConfiguration(ConfigurationRequestDTO configurationRequestDTO) {
+        if (configurationRequestDTO == null) return null;
+        return modelMapper.map(configurationRequestDTO, Configuration.class);
+    }
+
+    public ConfigurationResponseDTO toConfigurationResponseDTO(Configuration configuration) {
+        if (configuration == null) return null;
+        return modelMapper.map(configuration, ConfigurationResponseDTO.class);
+    }
+
+    public List<ConfigurationResponseDTO> toConfigurationResponseDTOList(List<Configuration> configurations) {
+        if (configurations == null) return Collections.emptyList();
+        return configurations.stream().map(this::toConfigurationResponseDTO).toList();
     }
 }
