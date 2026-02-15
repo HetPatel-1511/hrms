@@ -2,6 +2,7 @@ package com.example.hrmsbackend.controllers;
 
 import com.example.hrmsbackend.dtos.response.ApiResponse;
 import com.example.hrmsbackend.dtos.response.AuthEmployeeResponseDTO;
+import com.example.hrmsbackend.dtos.response.EmployeeDetailsResponseDTO;
 import com.example.hrmsbackend.services.EmployeeService;
 import com.example.hrmsbackend.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,5 +32,10 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<AuthEmployeeResponseDTO>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ResponseUtil.success(employeeService.getById(id), "Employees fetched successfully", 200));
+    }
+
+    @GetMapping("/{id}/details")
+    public ResponseEntity<ApiResponse<EmployeeDetailsResponseDTO>> getEmployeeDetails(@PathVariable Long id) {
+        return ResponseEntity.ok(ResponseUtil.success(employeeService.getEmployeeDetails(id), "Employee details fetched successfully", 200));
     }
 }

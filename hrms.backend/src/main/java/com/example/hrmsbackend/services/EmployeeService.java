@@ -1,6 +1,8 @@
 package com.example.hrmsbackend.services;
 
 import com.example.hrmsbackend.dtos.response.AuthEmployeeResponseDTO;
+import com.example.hrmsbackend.dtos.response.EmployeeDetailsResponseDTO;
+import com.example.hrmsbackend.dtos.response.EmployeeSummaryDTO;
 import com.example.hrmsbackend.entities.Employee;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
@@ -31,5 +33,25 @@ public class EmployeeService {
             throw new ResourceNotFoundException("Employe with id " + id + " doesn't exist");
         }
         return entityMapper.toAuthEmployeeResponseDTO(employee);
+    }
+
+    public EmployeeDetailsResponseDTO getEmployeeDetails(Long id) {
+        Employee employee = employeeRepo.findByIdWithDetails(id);
+        if (employee == null) {
+            throw new ResourceNotFoundException("Employee with id " + id + " doesn't exist");
+        }
+
+        EmployeeDetailsResponseDTO response = entityMapper.toEmployeeDetailsResponseDTO(employee);
+
+        setDirectReports(employee, response);
+
+        return response;
+    }
+
+    private void setDirectReports(Employee employee, EmployeeDetailsResponseDTO response) {
+        if (employee.getSubordinates() != null) {
+            List<EmployeeSummaryDTO> directReports = entityMapper.toEmployeeSummaryDTOList(employee.getSubordinates());
+            response.setDirectReports(directReports);
+        }
     }
 }

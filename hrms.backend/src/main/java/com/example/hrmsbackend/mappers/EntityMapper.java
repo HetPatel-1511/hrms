@@ -119,6 +119,50 @@ public class EntityMapper {
         return modelMapper.map(expense, ExpenseResponseDTO.class);
     }
 
+    public EmployeeManagerDetailsResponseDTO toEmployeeManagerDetailsResponseDTO(Employee employee) {
+        if (employee == null) return null;
+        EmployeeManagerDetailsResponseDTO dto = new EmployeeManagerDetailsResponseDTO();
+        dto.setId(employee.getId());
+        dto.setName(employee.getName());
+        dto.setEmail(employee.getEmail());
+        dto.setDesignation(employee.getDesignation());
+        dto.setCreatedAt(employee.getCreatedAt());
+
+        if (employee.getManager() != null) {
+            dto.setManager(toEmployeeManagerDetailsResponseDTO(employee.getManager()));
+        }
+
+        if (employee.getProfileMedia() != null) {
+            dto.setProfileMedia(toMediaResponseDTO(employee.getProfileMedia()));
+        }
+
+        return dto;
+    }
+
+    public EmployeeDetailsResponseDTO toEmployeeDetailsResponseDTO(Employee employee) {
+        if (employee == null) return null;
+        EmployeeDetailsResponseDTO dto = new EmployeeDetailsResponseDTO();
+        dto.setId(employee.getId());
+        dto.setName(employee.getName());
+        dto.setEmail(employee.getEmail());
+        dto.setDesignation(employee.getDesignation());
+        dto.setCreatedAt(employee.getCreatedAt());
+
+        if (employee.getManager() != null) {
+            dto.setManager(toEmployeeManagerDetailsResponseDTO(employee.getManager()));
+        }
+
+        if (employee.getProfileMedia() != null) {
+            dto.setProfileMedia(toMediaResponseDTO(employee.getProfileMedia()));
+        }
+
+        if (employee.getSubordinates() != null) {
+            dto.setDirectReports(toEmployeeSummaryDTOList(employee.getSubordinates()));
+        }
+
+        return dto;
+    }
+
     public List<ExpenseResponseDTO> toExpenseResponseDTOList(List<Expense> expenses) {
         if (expenses == null) return Collections.emptyList();
         return expenses.stream().map(this::toExpenseResponseDTO).toList();

@@ -49,11 +49,11 @@ public class Employee {
     @Column(name = "is_active", nullable = false)
     private Boolean active = true;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_manager_id")
     private Employee manager;
 
-    @OneToMany(mappedBy = "manager")
+    @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
     private List<Employee> subordinates;
 
     @NotNull

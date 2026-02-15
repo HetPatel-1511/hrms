@@ -1,22 +1,26 @@
 package com.example.hrmsbackend.dtos.response;
 
 import com.example.hrmsbackend.entities.Designation;
-import com.example.hrmsbackend.entities.Media;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-public class EmployeeSummaryDTO {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class EmployeeManagerDetailsResponseDTO {
     private Long id;
+
     private String name;
+
     private String email;
+
     private Designation designation;
+
     private MediaResponseDTO profileMedia;
+
     private LocalDateTime createdAt;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer maxAmountPerDay;
+    private EmployeeManagerDetailsResponseDTO manager;
 
     public Long getId() {
         return id;
@@ -42,12 +46,12 @@ public class EmployeeSummaryDTO {
         this.email = email;
     }
 
-    public Designation getDesignation() {
-        return designation;
+    public MediaResponseDTO getProfileMedia() {
+        return profileMedia;
     }
 
-    public void setDesignation(Designation designation) {
-        this.designation = designation;
+    public void setProfileMedia(MediaResponseDTO profileMedia) {
+        this.profileMedia = profileMedia;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -58,19 +62,19 @@ public class EmployeeSummaryDTO {
         this.createdAt = createdAt;
     }
 
-    public Integer getMaxAmountPerDay() {
-        return maxAmountPerDay;
+    public EmployeeManagerDetailsResponseDTO getManager() {
+        return manager;
     }
 
-    public void setMaxAmountPerDay(Integer maxAmountPerDay) {
-        this.maxAmountPerDay = maxAmountPerDay;
+    public void setManager(EmployeeManagerDetailsResponseDTO manager) {
+        this.manager = manager;
     }
 
-    public MediaResponseDTO getProfileMedia() {
-        return profileMedia;
+    public Designation getDesignation() {
+        return designation;
     }
 
-    public void setProfileMedia(MediaResponseDTO profileMedia) {
-        this.profileMedia = profileMedia;
+    public void setDesignation(Designation designation) {
+        this.designation = designation;
     }
 }
