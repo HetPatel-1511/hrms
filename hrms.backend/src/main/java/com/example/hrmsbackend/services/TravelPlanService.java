@@ -43,7 +43,7 @@ public class TravelPlanService {
     }
 
     public List<TravelPlanResponseDTO> getAll() {
-        return entityMapper.toTravelPlanResponseDTOList(travelPlanRepo.findAll());
+        return entityMapper.toTravelPlanResponseDTOList(travelPlanRepo.findAllByOrderByCreatedAtDesc());
     }
 
     @Transactional
