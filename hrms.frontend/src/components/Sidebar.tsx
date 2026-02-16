@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import SidebarListButton from './SidebarListButton'
-import { ArrowRightEndOnRectangleIcon, CameraIcon, HomeIcon } from '@heroicons/react/24/solid'
+import { ArrowRightEndOnRectangleIcon, CameraIcon, HomeIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { href } from 'react-router'
 
 const Sidebar = React.memo(() => {
@@ -22,7 +22,13 @@ const Sidebar = React.memo(() => {
                     href: "travel-plan/add"
                 }
             ]
-        }
+        },
+        {
+            title: "Employees",
+            isDropdown: false,
+            href: "/employee",
+            Icon: <UserCircleIcon className='h-6 w-6' />
+        },
     ]
     return (
         <aside

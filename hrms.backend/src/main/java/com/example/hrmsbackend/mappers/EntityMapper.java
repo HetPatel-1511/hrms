@@ -33,6 +33,9 @@ public class EntityMapper {
         if (employee.getEmployeeRoles()!=null){
             dto.setRoles(employee.getEmployeeRoles().stream().map(this::mapRole).toList());
         }
+        if (employee.getManager()!=null){
+            dto.setManager(toEmployeeSummaryDTO(employee.getManager()));
+        }
         return dto;
     }
 

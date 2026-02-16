@@ -4,3 +4,8 @@ export const fetchEmployees = async () => {
     const res = await axios.get("/employees");
     return res.data
 }
+
+export const fetchSingleEmployee = async (employeeId: any) => {
+    const res = await axios.get(`/employees/${employeeId}/details`);
+    return res.data
+}

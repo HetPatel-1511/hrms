@@ -8,6 +8,8 @@ import SingleTravelPlan from "../pages/SingleTravelPlan";
 import TravelPlanEmployeeDocuments from "../pages/TravelPlanEmployeeDocuments";
 import TravelPlanEmployeeExpenses from "../pages/TravelPlanEmployeeExpenses";
 import AddTravelPlanEmployeeExpenses from "../pages/AddTravelPlanEmployeeExpenses";
+import Employee from "../pages/Employee";
+import SingleEmployee from "../pages/SingleEmployee";
 
 export default [
     {
@@ -43,6 +45,19 @@ export default [
                     },
                 ]
             },
+            {
+                path: "employee",
+                children:[
+                    {
+                        index: true,
+                        element: <Employee />
+                    },
+                    {
+                        path: ":employeeId",
+                        element: <SingleEmployee />
+                    },
+                ]
+            }
         ],
     },
     {
