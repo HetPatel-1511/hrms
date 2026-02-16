@@ -10,6 +10,9 @@ import TravelPlanEmployeeExpenses from "../pages/TravelPlanEmployeeExpenses";
 import AddTravelPlanEmployeeExpenses from "../pages/AddTravelPlanEmployeeExpenses";
 import Employee from "../pages/Employee";
 import SingleEmployee from "../pages/SingleEmployee";
+import Configuration from "../pages/Configuration";
+import AddConfiguration from "../pages/AddConfiguration";
+import EditConfiguration from "../pages/EditConfiguration";
 
 export default [
     {
@@ -57,7 +60,24 @@ export default [
                         element: <SingleEmployee />
                     },
                 ]
-            }
+            },
+            {
+                path: "configuration",
+                children:[
+                    {
+                        index: true,
+                        element: <Configuration />
+                    },
+                    {
+                        path: "add",
+                        element: <AddConfiguration />
+                    },
+                    {
+                        path: ":configKey/edit",
+                        element: <EditConfiguration />
+                    },
+                ]
+            },
         ],
     },
     {

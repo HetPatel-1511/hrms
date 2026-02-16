@@ -63,4 +63,11 @@ public class ConfigurationService {
         Configuration updatedConfiguration = configurationRepo.save(existingConfiguration);
         return entityMapper.toConfigurationResponseDTO(updatedConfiguration);
     }
+
+    public ConfigurationResponseDTO getConfigurationByKey(String key) {
+        Configuration existingConfiguration = configurationRepo.findByConfigKey(key)
+                .orElseThrow(() -> new ResourceNotFoundException("Configuration not found with key: " + key));
+
+        return entityMapper.toConfigurationResponseDTO(existingConfiguration);
+    }
 }

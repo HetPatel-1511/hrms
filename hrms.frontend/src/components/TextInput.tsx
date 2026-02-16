@@ -11,7 +11,8 @@ const FormInput = ({
     validation = {},
     options = [],
     onChange,
-    isMult= true
+    isMult= true,
+    ...props
 }: any) => {
     return (
         <div className="mb-5">
@@ -35,6 +36,7 @@ const FormInput = ({
                     {...register(id, validation)}
                     className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
                     placeholder={placeholder}
+                    {...props}
                 />
             }
             {errors[id] && (

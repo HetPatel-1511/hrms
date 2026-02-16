@@ -33,6 +33,12 @@ public class ConfigurationController {
         return ResponseEntity.ok(ResponseUtil.success(createdConfiguration, "Configuration created successfully", 201));
     }
 
+    @GetMapping("/{key}")
+    public ResponseEntity<ApiResponse<ConfigurationResponseDTO>> getConfigurationByKey(@PathVariable String key) {
+        ConfigurationResponseDTO configuration = configurationService.getConfigurationByKey(key);
+        return ResponseEntity.ok(ResponseUtil.success(configuration, "Configuration fetched successfully", 200));
+    }
+
     @PutMapping("/{key}")
     public ResponseEntity<ApiResponse<ConfigurationResponseDTO>> updateConfiguration(@PathVariable String key, @Validated(Update.class) @RequestBody ConfigurationRequestDTO configurationRequestDTO, @AuthenticationPrincipal CustomUserDetails currentUser) {
         ConfigurationResponseDTO updatedConfiguration = configurationService.updateConfiguration(key, configurationRequestDTO, currentUser);
