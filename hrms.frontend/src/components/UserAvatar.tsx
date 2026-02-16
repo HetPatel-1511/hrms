@@ -7,7 +7,7 @@ const UserAvatar = ({ user, className="" }: any) => {
     return (
       <img
         className={`${commonClasses} ${className}`}
-        src={user.image || "https://hrms-media-dev-hp.s3.eu-north-1.amazonaws.com/Tickets/01604050-ee6f-4112-b77b-a68982b0173f_user-placeholder.jpg"}
+        src={user.image}
         alt={user.name || "User Avatar"}
       />
     );

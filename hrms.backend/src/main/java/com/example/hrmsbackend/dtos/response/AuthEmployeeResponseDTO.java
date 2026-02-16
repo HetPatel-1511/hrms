@@ -24,7 +24,7 @@ public class AuthEmployeeResponseDTO {
 
     private Designation designation;
 
-    private Media profileMedia;
+    private MediaResponseDTO profileMedia;
 
     private EmployeeSummaryDTO manager;
 
@@ -96,14 +96,6 @@ public class AuthEmployeeResponseDTO {
         this.designation = designation;
     }
 
-    public Media getProfileMedia() {
-        return profileMedia;
-    }
-
-    public void setProfileMedia(Media profileMedia) {
-        this.profileMedia = profileMedia;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -138,6 +130,14 @@ public class AuthEmployeeResponseDTO {
 
     public void setRoles(List<RoleResponseDTO> roles) {
         this.roles = roles;
+    }
+
+    public MediaResponseDTO getProfileMedia() {
+        return profileMedia;
+    }
+
+    public void setProfileMedia(MediaResponseDTO profileMedia) {
+        this.profileMedia = profileMedia;
     }
 }
 
