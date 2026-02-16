@@ -11,6 +11,7 @@ import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.EmployeeRepo;
 import com.example.hrmsbackend.repos.ExpenseRepo;
 import com.example.hrmsbackend.repos.TravelPlanEmployeeRepo;
+import com.example.hrmsbackend.repos.TravelPlanRepo;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
@@ -30,23 +33,26 @@ public class ExpenseService {
     private EntityMapper entityMapper;
     private EmailService emailService;
     private EmployeeRepo employeeRepo;
+    private TravelPlanRepo travelPlanRepo;
 
     @Value("${hr.email}")
     private String hrEmail;
 
     @Autowired
-    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo) {
+    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo, TravelPlanRepo travelPlanRepo) {
         this.expenseRepo = expenseRepo;
         this.travelPlanEmployeeRepo = travelPlanEmployeeRepo;
         this.mediaService = mediaService;
         this.entityMapper = entityMapper;
         this.emailService = emailService;
         this.employeeRepo = employeeRepo;
+        this.travelPlanRepo = travelPlanRepo;
     }
 
     @Transactional
     public ExpenseResponseDTO create(ExpenseCreateRequestDTO dto, CustomUserDetails userDetails) {
-        TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(dto.getTravelPlanEmployeeId());
+        Result result = getTravelPlanEmployeeDetails(dto.getTravelPlanId(), dto.getEmployeeId());
+        TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(result.travelPlanEmployeeId);
         validateSubmissionWindow(travelPlanEmployee);
 
         Media media = uploadProofFile(dto.getExpenseMedia(), userDetails);
@@ -74,37 +80,67 @@ public class ExpenseService {
         return entityMapper.toExpenseResponseDTO(expense);
     }
 
-    public ExpenseListResponseDTO getExpensesByTravelPlanEmployeeId(Long travelPlanEmployeeId, CustomUserDetails userDetails) {
-        TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(travelPlanEmployeeId);
-        validateAccessPermission(travelPlanEmployee, userDetails);
+    public ExpenseListResponseDTO getExpensesByTravelPlanEmployee(Long travelPlanId,Long employeeId, CustomUserDetails userDetails) {
+        Result result = getTravelPlanEmployeeDetails(travelPlanId, employeeId);
+        validateAccessPermission(result.travelPlanEmployee(), userDetails);
 
-        List<Expense> expenses = expenseRepo.findByTravelPlanEmployeeId(travelPlanEmployeeId);
+        List<Expense> expenses = expenseRepo.findByTravelPlanEmployeeId(result.travelPlanEmployeeId());
         List<ExpenseResponseDTO> expenseDTOs = entityMapper.toExpenseResponseDTOList(expenses);
 
-        AmountResult amountResult = getAmountBreakdown(expenses);
+        AmountResult amountResult = getAmountBreakdown(expenseDTOs);
 
-        ExpenseListResponseDTO response = new ExpenseListResponseDTO();
-        response.setExpenses(expenseDTOs);
-        response.setTotalClaimedAmount(amountResult.totalClaimedAmount());
-        response.setTotalUnclaimableAmount(amountResult.totalUnclaimableAmount());
-        response.setTotalCount((long) expenseDTOs.size());
+        ExpenseListResponseDTO response = getExpenseListResponseDTO(expenseDTOs, amountResult, result);
 
         return response;
     }
 
-    private static @NonNull AmountResult getAmountBreakdown(List<Expense> expenses) {
-        Integer totalClaimedAmount = expenses.stream()
-                .mapToInt(expense->Math.min(expense.getAmount(), expense.getTravelPlanEmployee().getMaxAmountPerDay()))
-                .sum();
+    private @NonNull ExpenseListResponseDTO getExpenseListResponseDTO(List<ExpenseResponseDTO> expenseDTOs, AmountResult amountResult, Result result) {
+        ExpenseListResponseDTO response = new ExpenseListResponseDTO();
+        response.setExpenses(expenseDTOs);
+        response.setTotalClaimedAmount(amountResult.totalClaimedAmount());
+        response.setTotalUnclaimableAmount(amountResult.totalUnclaimableAmount());
+        response.setTotalAmount(amountResult.totalAmount());
+        response.setTotalCount((long) expenseDTOs.size());
+        response.setTravelPlan(entityMapper.toTravelPlanSummaryResponseDTO(result.travelPlan()));
+        response.setEmployee(entityMapper.toEmployeeSummaryDTO(result.employee()));
+        return response;
+    }
 
-        Integer totalUnclaimableAmount = expenses.stream()
-                .mapToInt(expense->Math.max(expense.getAmount() - expense.getTravelPlanEmployee().getMaxAmountPerDay(), 0))
-                .sum();
-        AmountResult amountResult = new AmountResult(totalClaimedAmount, totalUnclaimableAmount);
+    private @NonNull Result getTravelPlanEmployeeDetails(Long travelPlanId, Long employeeId) {
+        TravelPlan travelPlan = travelPlanRepo.findById(travelPlanId).orElseThrow(() -> new ResourceNotFoundException("Travel plan not found"));
+        Employee employee = employeeRepo.findById(employeeId).orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
+        TravelPlanEmployee travelPlanEmployee = travelPlanEmployeeRepo.findByTravelPlanAndEmployee(travelPlan, employee).orElseThrow(() -> new ResourceNotFoundException("Employee is not a part of the travel plan"));
+        Long travelPlanEmployeeId = travelPlanEmployee.getId();
+        Result result = new Result(travelPlan, employee, travelPlanEmployee, travelPlanEmployeeId);
+        return result;
+    }
+
+    private record Result(TravelPlan travelPlan, Employee employee, TravelPlanEmployee travelPlanEmployee, Long travelPlanEmployeeId) {
+    }
+
+    private static @NonNull AmountResult getAmountBreakdown(List<ExpenseResponseDTO> expenseDTOs) {
+        Map<LocalDate, DailyAmountResult> dailyTotals = expenseDTOs.stream()
+                .collect(Collectors.toMap(
+                        dto -> dto.getCreatedAt().toLocalDate(),
+                        dto -> new DailyAmountResult(dto.getAmount(), dto.getEmployee().getMaxAmountPerDay()), // Value mapper: initial summary
+                        (DailyAmountResult existingSummary,DailyAmountResult newSummary) -> new DailyAmountResult(
+                                existingSummary.totalAmount + newSummary.totalAmount,
+                                newSummary.maxAmountPerDay
+                        )
+                ));
+
+        Integer totalAmount = dailyTotals.values().stream().mapToInt(i->i.totalAmount).sum();
+        Integer totalClaimedAmount = dailyTotals.values().stream().mapToInt(i->Math.min(i.totalAmount, i.maxAmountPerDay)).sum();
+        Integer totalUnclaimableAmount = dailyTotals.values().stream().mapToInt(i->Math.max(i.totalAmount-i.maxAmountPerDay, 0)).sum();
+
+        AmountResult amountResult = new AmountResult(totalAmount, totalClaimedAmount, totalUnclaimableAmount);
         return amountResult;
     }
 
-    private record AmountResult(Integer totalClaimedAmount, Integer totalUnclaimableAmount) {
+    private record AmountResult(Integer totalAmount, Integer totalClaimedAmount, Integer totalUnclaimableAmount) {
+    }
+
+    private record DailyAmountResult(Integer totalAmount, Integer maxAmountPerDay) {
     }
 
     private void validateAccessPermission(TravelPlanEmployee travelPlanEmployee, CustomUserDetails userDetails) {

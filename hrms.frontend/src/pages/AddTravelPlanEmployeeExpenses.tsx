@@ -1,0 +1,74 @@
+import React, { useEffect } from 'react'
+import Button from '../components/Button'
+import { useForm } from 'react-hook-form';
+import FormInput from '../components/TextInput';
+import useAddTravelPlanExpenseMutation from '../query/queryHooks/useAddTravelPlanExpenseMutation';
+import { useNavigate, useParams } from 'react-router';
+
+const AddTravelPlanEmployeeExpenses = () => {
+    const navigate = useNavigate();
+    const { travelPlanId, employeeId } = useParams();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
+    } = useForm();
+
+    const addTravelPlanExpense = useAddTravelPlanExpenseMutation()
+    
+    const onSubmit = (data: any) => {
+        data = { ...data, expenseMedia: data.expenseMedia[0] };
+        addTravelPlanExpense.mutate({travelPlanId, employeeId, data});
+    };
+
+    useEffect(() => {
+        if (addTravelPlanExpense.isSuccess) {
+            navigate(`/travel-plan/${travelPlanId}/employee/${employeeId}/expenses`)
+        }
+    }, [addTravelPlanExpense.isSuccess])
+
+    return (
+        <div>
+            <h1 className='text-2xl mb-4'>Add Expense</h1>
+            <form className="">
+                <div className="mb-5">
+                    <FormInput
+                        type="number"
+                        label="Amount"
+                        id="amount"
+                        placeholder="19.99"
+                        register={register}
+                        errors={errors}
+                        validation={{ required: 'Amount is mandatory' }}
+                    />
+                </div>
+                <div className="mb-5">
+                    <FormInput
+                        label="Description"
+                        id="description"
+                        placeholder=""
+                        register={register}
+                        errors={errors}
+                        validation={{ required: 'Description is mandatory' }}
+                    />
+                </div>
+                <div className="mb-5">
+                    <FormInput
+                        type="file"
+                        label="Expense Proof"
+                        id="expenseMedia"
+                        placeholder=""
+                        register={register}
+                        errors={errors}
+                        validation={{ required: 'Expense Proof is mandatory' }}
+                    />
+                </div>
+                <Button onClick={handleSubmit(onSubmit)}>
+                    Submit
+                </Button>
+            </form>
+        </div>
+    )
+}
+
+export default AddTravelPlanEmployeeExpenses

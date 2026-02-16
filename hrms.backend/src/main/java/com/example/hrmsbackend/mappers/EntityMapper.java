@@ -79,6 +79,12 @@ public class EntityMapper {
         return dto;
     }
 
+    public TravelPlanSummaryResponseDTO toTravelPlanSummaryResponseDTO(TravelPlan travelPlan) {
+        if (travelPlan == null) return null;
+        TravelPlanSummaryResponseDTO dto = modelMapper.map(travelPlan, TravelPlanSummaryResponseDTO.class);
+        return dto;
+    }
+
     public EmployeeSummaryDTO mapTravellingEmployees(TravelPlanEmployee travelPlanEmployee) {
         EmployeeSummaryDTO dto = this.toEmployeeSummaryDTO(travelPlanEmployee.getEmployee());
         dto.setMaxAmountPerDay(travelPlanEmployee.getMaxAmountPerDay());

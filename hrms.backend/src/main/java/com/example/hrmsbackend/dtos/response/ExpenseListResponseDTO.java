@@ -14,7 +14,14 @@ public class ExpenseListResponseDTO {
     private Integer totalUnclaimableAmount;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer totalAmount;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long totalCount;
+
+    private TravelPlanSummaryResponseDTO travelPlan;
+
+    private EmployeeSummaryDTO employee;
 
     public List<ExpenseResponseDTO> getExpenses() {
         return expenses;
@@ -46,5 +53,29 @@ public class ExpenseListResponseDTO {
 
     public void setTotalUnclaimableAmount(Integer totalUnclaimableAmount) {
         this.totalUnclaimableAmount = totalUnclaimableAmount;
+    }
+
+    public TravelPlanSummaryResponseDTO getTravelPlan() {
+        return travelPlan;
+    }
+
+    public void setTravelPlan(TravelPlanSummaryResponseDTO travelPlan) {
+        this.travelPlan = travelPlan;
+    }
+
+    public EmployeeSummaryDTO getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(EmployeeSummaryDTO employee) {
+        this.employee = employee;
+    }
+
+    public Integer getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Integer totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

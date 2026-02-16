@@ -17,4 +17,6 @@ import java.util.Optional;
 public interface TravelPlanEmployeeRepo extends JpaRepository<TravelPlanEmployee, Long> {
     @Query("SELECT tpe.employee FROM TravelPlanEmployee tpe WHERE tpe.travelPlan.id = :travelPlanId")
     List<Employee> findTravellingEmployeesByTravelPlanId(@Param("travelPlanId") Long travelPlanId);
+
+    Optional<TravelPlanEmployee> findByTravelPlanAndEmployee(TravelPlan travelPlan, Employee employee);
 }

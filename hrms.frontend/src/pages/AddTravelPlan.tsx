@@ -17,7 +17,6 @@ const AddTravelPlan = () => {
     } = useForm();
     const [selectedEmployees, setSelectedEmployees] = useState<any>([]);
 
-
     const navigate = useNavigate()
     const addTravelPlan = useAddTravelPlanMutation()
     const { data, isLoading, error, isSuccess } = useEmployeesQuery()

@@ -26,16 +26,18 @@ public class ExpenseController {
         this.expenseService = expenseService;
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path="/travel-plan/{travelPlanId}/employee/{employeeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ExpenseResponseDTO>> create(
-            @RequestPart("travelPlanEmployeeId") String travelPlanEmployeeId,
+            @PathVariable("travelPlanId") String travelPlanId,
+            @PathVariable("employeeId") String employeeId,
             @RequestPart("amount") String amount,
             @RequestPart("description") String description,
             @RequestPart("expenseMedia") MultipartFile expenseMedia,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         ExpenseCreateRequestDTO dto = new ExpenseCreateRequestDTO();
-        dto.setTravelPlanEmployeeId(Long.parseLong(travelPlanEmployeeId));
+        dto.setTravelPlanId(Long.parseLong(travelPlanId));
+        dto.setEmployeeId(Long.parseLong(employeeId));
         dto.setAmount(Integer.parseInt(amount));
         dto.setDescription(description);
         dto.setExpenseMedia(expenseMedia);
@@ -53,11 +55,12 @@ public class ExpenseController {
         return ResponseEntity.ok(ResponseUtil.success(expenseService.changeExpenseStatus(dto, userDetails), "Expense status updated successfully", 200));
     }
 
-    @GetMapping("/travel-plan-employee/{travelPlanEmployeeId}")
+    @GetMapping("/travel-plan/{travelPlanId}/employee/{employeeId}")
     public ResponseEntity<ApiResponse<ExpenseListResponseDTO>> getExpensesByTravelPlanEmployeeId(
-            @PathVariable Long travelPlanEmployeeId,
+            @PathVariable Long travelPlanId,
+            @PathVariable Long employeeId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return ResponseEntity.ok(ResponseUtil.success(expenseService.getExpensesByTravelPlanEmployeeId(travelPlanEmployeeId, userDetails), "Expenses fetched successfully", 200));
+        return ResponseEntity.ok(ResponseUtil.success(expenseService.getExpensesByTravelPlanEmployee(travelPlanId, employeeId, userDetails), "Expenses fetched successfully", 200));
     }
 }

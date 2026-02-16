@@ -4,7 +4,7 @@ import { fetchSingleTravelPlans } from '../api/travelPlan'
 
 const useSingleTravelPlanQuery = (id: any) => {
     return useQuery({
-        queryKey: [QUERY_KEY.TRAVEL_PLAN],
+        queryKey: [QUERY_KEY.TRAVEL_PLAN, id],
         queryFn: () => fetchSingleTravelPlans(id)
     })
 }

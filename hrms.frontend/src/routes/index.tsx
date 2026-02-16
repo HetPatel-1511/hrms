@@ -6,6 +6,8 @@ import TravelPlan from "../pages/TravelPlan";
 import AddTravelPlan from "../pages/AddTravelPlan";
 import SingleTravelPlan from "../pages/SingleTravelPlan";
 import TravelPlanEmployeeDocuments from "../pages/TravelPlanEmployeeDocuments";
+import TravelPlanEmployeeExpenses from "../pages/TravelPlanEmployeeExpenses";
+import AddTravelPlanEmployeeExpenses from "../pages/AddTravelPlanEmployeeExpenses";
 
 export default [
     {
@@ -16,7 +18,7 @@ export default [
                 path: "travel-plan",
                 children: [
                     {
-                        path: "",
+                        index: true,
                         element: <TravelPlan />,
                     },
                     {
@@ -30,6 +32,14 @@ export default [
                     {
                         path: ":travelPlanId/employee/:employeeId/documents",
                         element: <TravelPlanEmployeeDocuments />,
+                    },
+                    {
+                        path: ":travelPlanId/employee/:employeeId/expenses",
+                        element: <TravelPlanEmployeeExpenses />,
+                    },
+                    {
+                        path: ":travelPlanId/employee/:employeeId/expenses/add",
+                        element: <AddTravelPlanEmployeeExpenses />,
                     },
                 ]
             },

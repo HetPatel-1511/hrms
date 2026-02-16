@@ -3,9 +3,7 @@ package com.example.hrmsbackend.services;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.TravelPlanRequestDTO;
 import com.example.hrmsbackend.dtos.request.TravelingEmployeeRequestDTO;
-import com.example.hrmsbackend.dtos.response.EmployeeSummaryDTO;
-import com.example.hrmsbackend.dtos.response.TravelDocumentResponseDTO;
-import com.example.hrmsbackend.dtos.response.TravelPlanResponseDTO;
+import com.example.hrmsbackend.dtos.response.*;
 import com.example.hrmsbackend.entities.*;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
@@ -155,11 +153,40 @@ public class TravelPlanService {
         return travelPlanEmployee1;
     }
 
-    public List<TravelDocumentResponseDTO> getDocuments(Long travelPlanId, Long employeeId) {
+    public TravelDocumentListResponseDTO getDocuments(Long travelPlanId, Long employeeId) {
         TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(travelPlanId, employeeId);
 
-        List<TravelDocument> travelDocuments = travelDocumentRepo.findAllByTravelPlanEmployeeId(travelPlanEmployee.getId());
+        Employee employee = getEmployee(employeeId);
+        TravelPlan travelPlan = getTravelPlan(travelPlanId);
+        List<DocumentType> documentTypes = documentTypeRepo.findAll();
 
-        return entityMapper.toTravelDocumentResponseDTOList(travelDocuments);
+        TravelDocumentListResponseDTO travelDocumentListResponseDTO = getTravelDocumentListResponseDTO(travelPlanEmployee, employee, travelPlan, documentTypes);
+        return travelDocumentListResponseDTO;
+    }
+
+    private @NonNull TravelDocumentListResponseDTO getTravelDocumentListResponseDTO(TravelPlanEmployee travelPlanEmployee, Employee employee, TravelPlan travelPlan, List<DocumentType> documentTypes) {
+        List<TravelDocument> travelDocuments = travelDocumentRepo.findAllByTravelPlanEmployeeId(travelPlanEmployee.getId());
+        TravelDocumentListResponseDTO travelDocumentListResponseDTO = new TravelDocumentListResponseDTO();
+        travelDocumentListResponseDTO.setTravelDocuments(entityMapper.toTravelDocumentResponseDTOList(travelDocuments));
+        travelDocumentListResponseDTO.setEmployee(entityMapper.toEmployeeSummaryDTO(employee));
+        travelDocumentListResponseDTO.setTravelPlan(entityMapper.toTravelPlanSummaryResponseDTO(travelPlan));
+        travelDocumentListResponseDTO.setDocumentTypes(entityMapper.toDocumentTypeResponseDTOList(documentTypes));
+        return travelDocumentListResponseDTO;
+    }
+
+    private @NonNull TravelPlan getTravelPlan(Long travelPlanId) {
+        TravelPlan travelPlan = travelPlanRepo.findById(travelPlanId).orElse(null);
+        if (travelPlan == null) {
+            throw new ResourceNotFoundException("Employee not found");
+        }
+        return travelPlan;
+    }
+
+    private @NonNull Employee getEmployee(Long employeeId) {
+        Employee employee = employeeRepo.findById(employeeId).orElse(null);
+        if (employee == null) {
+            throw new ResourceNotFoundException("Employee not found");
+        }
+        return employee;
     }
 }

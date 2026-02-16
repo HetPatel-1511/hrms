@@ -20,3 +20,18 @@ export const fetchEmployeeTravelPlanDocuments = async (travelPlanId: any, employ
     const res = await axios.get(`/travel-plans/${travelPlanId}/employee/${employeeId}/documents`);
     return res.data
 }
+
+export const fetchEmployeeTravelPlanExpenses = async (travelPlanId: any, employeeId: any) => {
+    const res = await axios.get(`/expenses/travel-plan/${travelPlanId}/employee/${employeeId}`);
+    return res.data
+}
+
+export const addTravelPlanDocument = async ({travelPlanId, employeeId, data}: any) => {
+    const res = await axios.post(`/travel-plans/${travelPlanId}/employee/${employeeId}/documents`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return res.data
+}
+
+export const addTravelPlanExpense = async ({travelPlanId, employeeId, data}: any) => {
+    const res = await axios.post(`expenses/travel-plan/${travelPlanId}/employee/${employeeId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return res.data
+}

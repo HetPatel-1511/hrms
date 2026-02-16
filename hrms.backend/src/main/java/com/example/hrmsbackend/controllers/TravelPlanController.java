@@ -5,6 +5,7 @@ import com.example.hrmsbackend.dtos.Update;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.TravelPlanRequestDTO;
 import com.example.hrmsbackend.dtos.response.ApiResponse;
+import com.example.hrmsbackend.dtos.response.TravelDocumentListResponseDTO;
 import com.example.hrmsbackend.dtos.response.TravelDocumentResponseDTO;
 import com.example.hrmsbackend.dtos.response.TravelPlanResponseDTO;
 import com.example.hrmsbackend.services.TravelPlanService;
@@ -53,7 +54,7 @@ public class TravelPlanController {
 //    }
 
     @GetMapping(value = "/{travelPlanId}/employee/{employeeId}/documents")
-    public ResponseEntity<ApiResponse<List<TravelDocumentResponseDTO>>> getDocuments(
+    public ResponseEntity<ApiResponse<TravelDocumentListResponseDTO>> getDocuments(
             @PathVariable("travelPlanId") Long travelPlanId,
             @PathVariable("employeeId") Long employeeId
     ) {

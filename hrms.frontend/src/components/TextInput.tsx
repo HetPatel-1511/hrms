@@ -10,7 +10,8 @@ const FormInput = ({
     placeholder,
     validation = {},
     options = [],
-    onChange
+    onChange,
+    isMult= true
 }: any) => {
     return (
         <div className="mb-5">
@@ -19,7 +20,7 @@ const FormInput = ({
             </label>
             {type == "multi-select" ?
                 <Select
-                    isMulti
+                    isMulti={isMult}
                     name={id}
                     id={id}
                     options={options}

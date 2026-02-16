@@ -23,6 +23,7 @@ public class Expense {
     private Integer amount;
 
     @NotBlank
+    @Size(max=2000)
     private String description;
 
     @NotBlank
