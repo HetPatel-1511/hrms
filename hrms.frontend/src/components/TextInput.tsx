@@ -1,4 +1,3 @@
-import React from 'react';
 import Select from 'react-select';
 
 const FormInput = ({
@@ -25,11 +24,23 @@ const FormInput = ({
                     name={id}
                     id={id}
                     options={options}
-                    {...register(id, validation)}
                     className="basic-multi-select"
                     onMenuOpen={() => { }}
                     onChange={onChange}
                 /> :
+                type == "select" ?
+                <select
+                    id={id}
+                    {...register(id, validation)}
+                    className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                >
+                    <option value="">Select {label}</option>
+                    {options.map((option: any) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select> :
                 <input
                     type={type}
                     id={id}

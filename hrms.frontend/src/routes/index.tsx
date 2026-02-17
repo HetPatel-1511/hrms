@@ -13,6 +13,11 @@ import SingleEmployee from "../pages/SingleEmployee";
 import Configuration from "../pages/Configuration";
 import AddConfiguration from "../pages/AddConfiguration";
 import EditConfiguration from "../pages/EditConfiguration";
+import JobOpenings from "../pages/JobOpenings";
+import AddJobOpening from "../pages/AddJobOpening";
+import SingleJobOpening from "../pages/SingleJobOpening";
+import ShareJob from "../pages/ShareJob";
+import ReferFriend from "../pages/ReferFriend";
 
 export default [
     {
@@ -58,6 +63,33 @@ export default [
                     {
                         path: ":employeeId",
                         element: <SingleEmployee />
+                    },
+                ]
+            },
+            {
+                path: "job-openings",
+                children:[
+                    {
+                        index: true,
+                        element: <JobOpenings />
+                    },
+                    {
+                        path: "add",
+                        element: <AddJobOpening />
+                    },
+                    {
+                        path: ":jobId",
+                        element: <SingleJobOpening />,
+                        children:[
+                            {
+                                path: "share",
+                                element: <ShareJob />
+                            },
+                            {
+                                path: "refer",
+                                element: <ReferFriend />
+                            },
+                        ]
                     },
                 ]
             },

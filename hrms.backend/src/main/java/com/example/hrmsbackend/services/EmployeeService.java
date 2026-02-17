@@ -54,4 +54,9 @@ public class EmployeeService {
             response.setDirectReports(directReports);
         }
     }
+
+    public List<AuthEmployeeResponseDTO> getByRole(String roleName) {
+        List<Employee> employees = employeeRepo.findByRoleName(roleName);
+        return entityMapper.toAuthEmployeeResponseDTOList(employees);
+    }
 }

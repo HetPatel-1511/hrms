@@ -5,6 +5,11 @@ export const fetchEmployees = async () => {
     return res.data
 }
 
+export const fetchEmployeesByRole = async (roleName: string) => {
+    const res = await axios.get(`/employees/role/${roleName}`);
+    return res.data
+}
+
 export const fetchSingleEmployee = async (employeeId: any) => {
     const res = await axios.get(`/employees/${employeeId}/details`);
     return res.data

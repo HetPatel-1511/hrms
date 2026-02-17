@@ -22,4 +22,7 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
 
     @Query("SELECT e FROM Employee e WHERE e.id = :employeeId")
     Employee findByIdWithDetails(@Param("employeeId") Long employeeId);
+
+    @Query("SELECT e FROM Employee e JOIN e.employeeRoles er JOIN er.role r WHERE r.name = :roleName")
+    List<Employee> findByRoleName(@Param("roleName") String roleName);
 }

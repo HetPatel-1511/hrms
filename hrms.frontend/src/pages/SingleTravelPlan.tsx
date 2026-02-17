@@ -62,30 +62,6 @@ const SingleTravelPlan = () => {
                     </div>
 
                     <div className="space-y-6">
-                        {travelPlan.recruiter && (
-                            <Card className="p-6">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-4">Recruiter Information</h2>
-                                <div className="space-y-3">
-                                    <div className="flex items-center">
-                                        <UserIcon className="h-5 w-5 text-gray-400 mr-3" />
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900">{travelPlan.recruiter.name}</p>
-                                            {travelPlan.recruiter?.role?.name && <p className="text-sm text-gray-500">{travelPlan.recruiter?.role?.name}</p>}
-                                        </div>
-                                    </div>
-                                    {travelPlan.recruiter.email && (
-                                        <div className="flex items-center">
-                                            <EnvelopeIcon className="h-5 w-5 text-gray-400 mr-3" />
-                                            <div>
-                                                <p className="text-sm text-gray-900">{travelPlan.recruiter.email}</p>
-                                                <p className="text-sm text-gray-500">Email</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </Card>
-                        )}
-
                         <Card className="p-6">
                             <div className="space-y-3">
                                 <div className="flex items-center">

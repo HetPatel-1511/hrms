@@ -41,6 +41,18 @@ const Sidebar = React.memo(() => {
                 }
             ]
         },
+        {
+            title: "Job Openings",
+            isDropdown: true,
+            href: "/job-openings",
+            Icon: <AdjustmentsHorizontalIcon className='h-6 w-6' />,
+            dropdown: [
+                {
+                    title: "Add New",
+                    href: "job-openings/add"
+                }
+            ]
+        },
     ]
     return (
         <aside

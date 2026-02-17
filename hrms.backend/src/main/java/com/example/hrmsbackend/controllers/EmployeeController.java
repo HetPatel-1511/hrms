@@ -38,4 +38,9 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<EmployeeDetailsResponseDTO>> getEmployeeDetails(@PathVariable Long id) {
         return ResponseEntity.ok(ResponseUtil.success(employeeService.getEmployeeDetails(id), "Employee details fetched successfully", 200));
     }
+
+    @GetMapping("/role/{roleName}")
+    public ResponseEntity<ApiResponse<List<AuthEmployeeResponseDTO>>> getByRole(@PathVariable String roleName) {
+        return ResponseEntity.ok(ResponseUtil.success(employeeService.getByRole(roleName), "Employees fetched successfully by role", 200));
+    }
 }
