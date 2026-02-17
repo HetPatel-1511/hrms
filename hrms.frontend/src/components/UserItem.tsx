@@ -12,10 +12,10 @@ const UserItem = ({ employee, showButtons=false }: any) => {
             <div>
                 <div className='flex items-center'>
                     <h6 className="text-slate-800 font-medium">
-                        {employee.name}
+                        {employee?.name}
                     </h6>
                     <p className="text-slate-500 text-sm ml-2">
-                        ({employee.email})
+                        ({employee?.email})
                     </p>
                 </div>
                 <p className="text-slate-500 text-sm">
@@ -24,8 +24,8 @@ const UserItem = ({ employee, showButtons=false }: any) => {
             </div>
             {showButtons && 
             <div className=' flex justify-end w-full'>
-                <Button to={`employee/${employee.id}/documents`}>Documents</Button>
-                <Button to={`employee/${employee.id}/expenses`} className="ml-2">Expenses</Button>
+                <Button to={`employee/${employee?.id}/documents`}>Documents</Button>
+                <Button to={`employee/${employee?.id}/expenses`} className="ml-2">Expenses</Button>
             </div>}
             </>
     )

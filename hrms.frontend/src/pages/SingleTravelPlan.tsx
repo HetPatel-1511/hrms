@@ -128,7 +128,7 @@ const SingleTravelPlan = () => {
                                             
                                             className="text-slate-800 flex w-full items-center rounded-md p-3 cursor-pointer transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
                                         >
-                                            <UserItem travellingEmployee={travellingEmployee} showButtons={true} />
+                                            <UserItem employee={travellingEmployee} showButtons={true} />
                                         </div>
                                     ))}
                                 </nav>

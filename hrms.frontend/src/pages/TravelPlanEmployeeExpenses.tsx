@@ -36,7 +36,7 @@ const TravelPlanEmployeeExpenses = () => {
           <div
             className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
           >
-            <UserItem travellingEmployee={travellingEmployee} key={travellingEmployee.id} />
+            <UserItem employee={travellingEmployee} key={travellingEmployee.id} />
           </div>
           <h1 className='text-2xl font-bold px-4 mt-2'>Expenses for {travelPlan.place} <span className='text-sm text-slate-600'>({travelPlan.startDate} to {travelPlan.endDate})</span></h1>
           <div className="p-4">
