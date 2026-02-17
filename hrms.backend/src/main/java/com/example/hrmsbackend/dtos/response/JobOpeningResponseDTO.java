@@ -2,6 +2,8 @@ package com.example.hrmsbackend.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JobOpeningResponseDTO {
     private Long id;
@@ -9,6 +11,8 @@ public class JobOpeningResponseDTO {
     private String summary;
     private Boolean isActive;
     private EmployeeSummaryDTO hr;
+    private MediaResponseDTO descriptionMedia;
+    private List<EmployeeSummaryDTO> cvReviewers;
 
     public Long getId() {
         return id;
@@ -48,5 +52,21 @@ public class JobOpeningResponseDTO {
 
     public void setHr(EmployeeSummaryDTO hr) {
         this.hr = hr;
+    }
+
+    public MediaResponseDTO getDescriptionMedia() {
+        return descriptionMedia;
+    }
+
+    public void setDescriptionMedia(MediaResponseDTO descriptionMedia) {
+        this.descriptionMedia = descriptionMedia;
+    }
+
+    public List<EmployeeSummaryDTO> getCvReviewers() {
+        return cvReviewers;
+    }
+
+    public void setCvReviewers(List<EmployeeSummaryDTO> cvReviewers) {
+        this.cvReviewers = cvReviewers;
     }
 }

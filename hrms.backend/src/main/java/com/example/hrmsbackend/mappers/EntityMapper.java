@@ -192,4 +192,26 @@ public class EntityMapper {
         if (configurations == null) return Collections.emptyList();
         return configurations.stream().map(this::toConfigurationResponseDTO).toList();
     }
+
+    public JobOpeningResponseDTO toJobOpeningResponseDTO(JobOpening jobOpening) {
+        if (jobOpening == null) return null;
+        JobOpeningResponseDTO dto = modelMapper.map(jobOpening, JobOpeningResponseDTO.class);
+        if (jobOpening.getHr() != null) {
+            dto.setHr(toEmployeeSummaryDTO(jobOpening.getHr()));
+        }
+        if (jobOpening.getDescriptionMedia() != null) {
+            dto.setDescriptionMedia(toMediaResponseDTO(jobOpening.getDescriptionMedia()));
+        }
+        if (jobOpening.getCvReviewers() != null) {
+            dto.setCvReviewers(jobOpening.getCvReviewers().stream()
+                    .map(cvReviewer -> toEmployeeSummaryDTO(cvReviewer.getReviewer()))
+                    .toList());
+        }
+        return dto;
+    }
+
+    public List<JobOpeningResponseDTO> toJobOpeningResponseDTOList(List<JobOpening> jobOpenings) {
+        if (jobOpenings == null) return Collections.emptyList();
+        return jobOpenings.stream().map(this::toJobOpeningResponseDTO).toList();
+    }
 }
