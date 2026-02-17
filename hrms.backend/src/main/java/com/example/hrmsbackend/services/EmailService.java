@@ -6,12 +6,17 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.util.Collection;
+import java.util.Collections;
 
 @Service
 public class EmailService {
@@ -53,13 +58,19 @@ public class EmailService {
         try {
             mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
             mimeMessageHelper.setFrom(sender);
-            mimeMessageHelper.setTo(details.getRecipient());
+            
+            if (details.getRecipients() != null && !details.getRecipients().isEmpty()) {
+                mimeMessageHelper.setTo(details.getRecipients().toArray(new String[0]));
+            } else {
+                mimeMessageHelper.setTo(details.getRecipient());
+            }
+            
             mimeMessageHelper.setText(details.getMsgBody());
             mimeMessageHelper.setSubject(details.getSubject());
 
-            FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
+            Resource resource = new UrlResource(details.getAttachment());
 
-            mimeMessageHelper.addAttachment(file.getFilename(), file);
+            mimeMessageHelper.addAttachment(resource.getFilename(), resource);
 
             javaMailSender.send(mimeMessage);
             return "Mail sent Successfully";
@@ -67,6 +78,8 @@ public class EmailService {
 
         catch (MessagingException e) {
             return "Error while sending mail!!!";
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

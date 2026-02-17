@@ -1,10 +1,11 @@
 package com.example.hrmsbackend.dtos.request;
 
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 public class EmailDetailsDTO {
-    @NotNull
     private String recipient;
+    private List<String> recipients;
 
     @NotNull
     private String msgBody;
@@ -21,6 +22,14 @@ public class EmailDetailsDTO {
 
     public void setRecipient(String recipient) {
         this.recipient = recipient;
+    }
+
+    public List<String> getRecipients() {
+        return recipients;
+    }
+
+    public void setRecipients(List<String> recipients) {
+        this.recipients = recipients;
     }
 
     public String getMsgBody() {

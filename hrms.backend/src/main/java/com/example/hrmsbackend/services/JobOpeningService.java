@@ -11,6 +11,7 @@ import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.EmployeeRepo;
 import com.example.hrmsbackend.repos.JobOpeningCvReviewerRepo;
 import com.example.hrmsbackend.repos.JobOpeningRepo;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -40,26 +41,24 @@ public class JobOpeningService {
 
     @Transactional
     public JobOpeningResponseDTO createJobOpening(JobOpeningRequestDTO request, UserDetails userDetails) {
-        Media descriptionMedia = mediaService.upload(request.getDescriptionMedia(), "job-description", userDetails);
-        
-        Employee hr = employeeRepo.findById(request.getHrId())
-                .orElseThrow(() -> new ResourceNotFoundException("HR employee not found with id: " + request.getHrId()));
-        
-        JobOpening jobOpening = new JobOpening();
-        jobOpening.setTitle(request.getTitle());
-        jobOpening.setSummary(request.getSummary());
-        jobOpening.setIsActive(true);
-        jobOpening.setHr(hr);
-        jobOpening.setDescriptionMedia(descriptionMedia);
-        
-        JobOpening savedJobOpening = jobOpeningRepo.save(jobOpening);
-        
+        Media descriptionMedia = saveDescriptionMedia(request.getDescriptionMedia(), userDetails);
+
+        Employee hr = getHr(request);
+
+        JobOpening savedJobOpening = saveJobOpening(request, hr, descriptionMedia);
+
+        saveCvReviewers(request, savedJobOpening);
+
+        return entityMapper.toJobOpeningResponseDTO(savedJobOpening);
+    }
+
+    private void saveCvReviewers(JobOpeningRequestDTO request, JobOpening savedJobOpening) {
         if (request.getCvReviewerIds() != null && !request.getCvReviewerIds().isEmpty()) {
             List<JobOpeningCvReviewer> cvReviewers = new ArrayList<>();
             for (Long reviewerId : request.getCvReviewerIds()) {
                 Employee reviewer = employeeRepo.findById(reviewerId)
                         .orElseThrow(() -> new ResourceNotFoundException("Reviewer employee not found with id: " + reviewerId));
-                
+
                 JobOpeningCvReviewer cvReviewer = new JobOpeningCvReviewer();
                 cvReviewer.setJobOpening(savedJobOpening);
                 cvReviewer.setReviewer(reviewer);
@@ -68,8 +67,29 @@ public class JobOpeningService {
             jobOpeningCvReviewerRepo.saveAll(cvReviewers);
             savedJobOpening.setCvReviewers(cvReviewers);
         }
-        
-        return entityMapper.toJobOpeningResponseDTO(savedJobOpening);
+    }
+
+    private @NonNull Employee getHr(JobOpeningRequestDTO request) {
+        Employee hr = employeeRepo.findById(request.getHrId())
+                .orElseThrow(() -> new ResourceNotFoundException("HR employee not found with id: " + request.getHrId()));
+        return hr;
+    }
+
+    private @NonNull JobOpening saveJobOpening(JobOpeningRequestDTO request, Employee hr, Media descriptionMedia) {
+        JobOpening jobOpening = new JobOpening();
+        jobOpening.setTitle(request.getTitle());
+        jobOpening.setSummary(request.getSummary());
+        jobOpening.setIsActive(true);
+        jobOpening.setHr(hr);
+        jobOpening.setDescriptionMedia(descriptionMedia);
+
+        JobOpening savedJobOpening = jobOpeningRepo.save(jobOpening);
+        return savedJobOpening;
+    }
+
+    private Media saveDescriptionMedia(MultipartFile descriptionMediaRequest, UserDetails userDetails) {
+        Media descriptionMedia = mediaService.upload(descriptionMediaRequest, "job-description", userDetails);
+        return descriptionMedia;
     }
 
     public JobOpeningResponseDTO getJobOpeningById(Long id) {

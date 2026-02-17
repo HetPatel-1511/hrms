@@ -20,10 +20,12 @@ public class Referal {
     @Column(nullable = false)
     private String name;
 
-    @NotBlank
     @Email
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String email;
+
+    @Column(nullable = true)
+    private String shortNote;
 
     @NotNull
     @Column(name = "created_at", nullable = false)
@@ -93,5 +95,13 @@ public class Referal {
 
     public void setReferedBy(Employee referedBy) {
         this.referredBy = referedBy;
+    }
+
+    public String getShortNote() {
+        return shortNote;
+    }
+
+    public void setShortNote(String shortNote) {
+        this.shortNote = shortNote;
     }
 }

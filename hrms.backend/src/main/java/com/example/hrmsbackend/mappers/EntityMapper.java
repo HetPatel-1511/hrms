@@ -214,4 +214,28 @@ public class EntityMapper {
         if (jobOpenings == null) return Collections.emptyList();
         return jobOpenings.stream().map(this::toJobOpeningResponseDTO).toList();
     }
+
+    public ShareJobResponseDTO toShareJobResponseDTO(SharedJob sharedJob) {
+        if (sharedJob == null) return null;
+        ShareJobResponseDTO dto = modelMapper.map(sharedJob, ShareJobResponseDTO.class);
+        if (sharedJob.getSharedBy() != null) {
+            dto.setSharedBy(toEmployeeSummaryDTO(sharedJob.getSharedBy()));
+        }
+        if (sharedJob.getJobOpening() != null) {
+            dto.setJobOpeningId(sharedJob.getJobOpening().getId());
+        }
+        return dto;
+    }
+
+    public ReferralResponseDTO toReferralResponseDTO(Referal referal) {
+        if (referal == null) return null;
+        ReferralResponseDTO dto = modelMapper.map(referal, ReferralResponseDTO.class);
+        if (referal.getReferedBy() != null) {
+            dto.setReferredBy(toEmployeeSummaryDTO(referal.getReferedBy()));
+        }
+        if (referal.getJobOpening() != null) {
+            dto.setJobOpening(toJobOpeningResponseDTO(referal.getJobOpening()));
+        }
+        return dto;
+    }
 }

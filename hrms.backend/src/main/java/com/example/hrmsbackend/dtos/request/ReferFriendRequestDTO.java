@@ -5,24 +5,15 @@ import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ReferFriendRequestDTO {
-    @NotNull(message = "Job opening cannot be null")
-    private Long jobOpeningId;
-
     @NotNull(message = "Friend name cannot be null")
     @Size(max = 100)
     private String name;
 
     private String email;
 
+    private String shortNote;
+
     private MultipartFile cvMedia;
-
-    public Long getJobOpeningId() {
-        return jobOpeningId;
-    }
-
-    public void setJobOpeningId(Long jobOpeningId) {
-        this.jobOpeningId = jobOpeningId;
-    }
 
     public String getName() {
         return name;
@@ -46,5 +37,13 @@ public class ReferFriendRequestDTO {
 
     public void setCvMedia(MultipartFile cvMedia) {
         this.cvMedia = cvMedia;
+    }
+
+    public String getShortNote() {
+        return shortNote;
+    }
+
+    public void setShortNote(String shortNote) {
+        this.shortNote = shortNote;
     }
 }
