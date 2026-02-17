@@ -10,7 +10,6 @@ public class MediaResponseDTO {
     private String originalName;
     private String fileName;
     private String url;
-    private EmployeeSummaryDTO uploadedBy;
     private LocalDateTime uploadedAt;
 
     public Long getId() {
@@ -43,14 +42,6 @@ public class MediaResponseDTO {
 
     public void setUploadedAt(LocalDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
-    }
-
-    public EmployeeSummaryDTO getUploadedBy() {
-        return uploadedBy;
-    }
-
-    public void setUploadedBy(EmployeeSummaryDTO uploadedBy) {
-        this.uploadedBy = uploadedBy;
     }
 
     public String getUrl() {
