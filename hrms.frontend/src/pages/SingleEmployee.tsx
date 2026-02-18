@@ -27,11 +27,15 @@ const SingleEmployee = () => {
                 </Card>
                 <Card className="mt-4 p-4">
                     <h1 className='text-xl font-bold'>Direct report</h1>
-                    {employee.directReports && employee.directReports.length>0 ? employee.directReports.map((employee: any) => {
-                        return <Link key={employee.id} to={`/employee/${employee.id}`} className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all mt-3 bg-slate-200 hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100">
-                            <UserItem employee={employee} />
-                        </Link>
-                    }): <p>Noone reports to {employee.name}</p>}
+                    {employee.directReports && employee.directReports.length > 0 ?
+                        <div className="grid grid-cols-2 mt-3 gap-4">
+                            {employee.directReports.map((employee: any) => {
+                                return <Link key={employee.id} to={`/employee/${employee.id}`} className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all bg-slate-200 hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100">
+                                    <UserItem employee={employee} />
+                                </Link>
+                            })}
+                        </div>
+                        : <p>Noone reports to {employee.name}</p>}
                 </Card>
             </div>
         )
@@ -43,23 +47,19 @@ const TreeNode = ({ node }: any) => {
 
     return (
         <div>
-            <div
-                className="flex items-center p-2 rounded-md transition duration-150"
-            >
-
+            {/* Recursive call */}
+            {hasChildren && (
+                <>
+                    <TreeNode key={node.id} node={node.manager} />
+                    <div className='bg-gray-500 w-0.5 m-auto h-8'></div>
+                </>
+            )}
+            <div className="flex items-center max-w-md mx-auto rounded-md transition duration-150">
                 {/* Node Content */}
-                <Link to={`/employee/${node.id}`} className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all mt-1 bg-slate-200 hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100">
+                <Link to={`/employee/${node.id}`} className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all bg-slate-200 hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100">
                     <UserItem employee={node} />
                 </Link>
             </div>
-
-            {/* Recursive call */}
-            {hasChildren && (
-                <div className="ml-2 border-l border-gray-200 pl-1">
-                    <TreeNode key={node.id} node={node.manager} />
-                </div>
-            )}
-
         </div>
     );
 };
