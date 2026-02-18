@@ -59,4 +59,12 @@ public class EmployeeService {
         List<Employee> employees = employeeRepo.findByRoleName(roleName);
         return entityMapper.toAuthEmployeeResponseDTOList(employees);
     }
+
+    public List<AuthEmployeeResponseDTO> searchEmployees(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return getAll();
+        }
+        List<Employee> employees = employeeRepo.findByNameOrEmailContaining(searchTerm.trim());
+        return entityMapper.toAuthEmployeeResponseDTOList(employees);
+    }
 }

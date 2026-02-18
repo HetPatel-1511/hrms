@@ -25,4 +25,7 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
 
     @Query("SELECT e FROM Employee e JOIN e.employeeRoles er JOIN er.role r WHERE r.name = :roleName")
     List<Employee> findByRoleName(@Param("roleName") String roleName);
+
+    @Query("SELECT e FROM Employee e WHERE LOWER(e.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(e.email) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    List<Employee> findByNameOrEmailContaining(@Param("searchTerm") String searchTerm);
 }

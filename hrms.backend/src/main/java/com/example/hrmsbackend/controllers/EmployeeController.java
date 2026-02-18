@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,8 +26,9 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AuthEmployeeResponseDTO>>> getAll() {
-        return ResponseEntity.ok(ResponseUtil.success(employeeService.getAll(), "Employees fetched successfully", 200));
+    public ResponseEntity<ApiResponse<List<AuthEmployeeResponseDTO>>> getAll(@RequestParam(required = false) String search) {
+        List<AuthEmployeeResponseDTO> employees = employeeService.searchEmployees(search);
+        return ResponseEntity.ok(ResponseUtil.success(employees, "Employees fetched successfully", 200));
     }
 
     @GetMapping("/{id}")

@@ -1,7 +1,11 @@
 import axios from "../../axios"
 
-export const fetchEmployees = async () => {
-    const res = await axios.get("/employees");
+export const fetchEmployees = async (search?: string) => {
+    const params = new URLSearchParams();
+    if (search) {
+        params.append('search', search);
+    }
+    const res = await axios.get(`/employees?${params.toString()}`);
     return res.data
 }
 

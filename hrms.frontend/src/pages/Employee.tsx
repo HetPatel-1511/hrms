@@ -1,27 +1,63 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import useEmployeesQuery from '../query/queryHooks/useEmployeeQuery'
 import UserAvatar from '../components/UserAvatar';
 import ServerError from '../components/ServerError';
 import Loading from '../components/Loading';
-import { Link } from 'react-router';
+import { SearchHeader } from '../components/SearchHeader';
+import { Link, useSearchParams } from 'react-router';
 import Card from '../components/Card';
 
 const Employee = () => {
-    const { data, isLoading, isError, error, isSuccess } = useEmployeesQuery()
-    
-    if (isLoading) {
-        return <Loading />
+    const [searchParams, setSearchParams] = useSearchParams()
+    const initialSearch = searchParams.get('search') || ''
+    const [searchInput, setSearchInput] = useState(initialSearch)
+    const [debouncedSearch, setDebouncedSearch] = useState(initialSearch)
+
+    const { data, isLoading, isError, isSuccess } = useEmployeesQuery(debouncedSearch)
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchInput)
+            if (searchInput.trim()) {
+                searchParams.set('search', searchInput)
+            } else {
+                searchParams.delete('search')
+            }
+            setSearchParams(searchParams)
+        }, 500)
+
+        return () => clearTimeout(timer)
+    }, [searchInput, searchParams, setSearchParams])
+
+    useEffect(() => {
+        setSearchInput(initialSearch)
+        setDebouncedSearch(initialSearch)
+    }, [initialSearch])
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(e.target.value)
     }
+    
     if (isError) {
         return <ServerError />
     }
-    if (isSuccess) {
-        const employees = data?.data;
-        return (
-            <div>
-                <h1 className='text-2xl font-bold'>Employees</h1>
+    
+    return (
+        <div>
+            {(isLoading || isSuccess) && (
+                <SearchHeader 
+                    title="Employees"
+                    searchValue={searchInput}
+                    onSearchChange={handleSearchChange}
+                    placeholder="Search employees..."
+                />
+            )}
+            
+            {isLoading && <Loading />}
+            
+            {isSuccess && (
                 <div>
-                    {employees?.map((employee: any) => {
+                    {data?.data?.map((employee: any) => {
                         return (
                             <Card>
                                 <Link to={`${employee.id}`} className="flex justify-between mt-3 gap-x-6 px-3 py-5 hover:shadow-lg">
@@ -41,9 +77,9 @@ const Employee = () => {
                         )
                     })}
                 </div>
-            </div>
-        )
-    }
+            )}
+        </div>
+    )
 }
 
 export default Employee
