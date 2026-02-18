@@ -99,6 +99,17 @@ public class EntityMapper {
         return travelPlans.stream().map(this::toTravelPlanResponseDTO).toList();
     }
 
+    public TravelPlanResponseDTO toTravelPlanResponseDTOWithoutEmployees(TravelPlan travelPlan) {
+        if (travelPlan == null) return null;
+        TravelPlanResponseDTO dto = modelMapper.map(travelPlan, TravelPlanResponseDTO.class);
+        return dto;
+    }
+
+    public List<TravelPlanResponseDTO> toTravelPlanResponseDTOListWithoutEmployees(List<TravelPlan> travelPlans) {
+        if (travelPlans == null) return Collections.emptyList();
+        return travelPlans.stream().map(this::toTravelPlanResponseDTOWithoutEmployees).toList();
+    }
+
     public TravelDocumentResponseDTO toTravelDocumentResponseDTO(TravelDocument travelDocument) {
         if (travelDocument == null) return null;
         return modelMapper.map(travelDocument, TravelDocumentResponseDTO.class);

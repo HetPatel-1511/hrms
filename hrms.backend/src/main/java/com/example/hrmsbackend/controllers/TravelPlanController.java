@@ -5,6 +5,7 @@ import com.example.hrmsbackend.dtos.Update;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.TravelPlanRequestDTO;
 import com.example.hrmsbackend.dtos.response.ApiResponse;
+import com.example.hrmsbackend.dtos.response.MyTravelsResponseDTO;
 import com.example.hrmsbackend.dtos.response.TravelDocumentListResponseDTO;
 import com.example.hrmsbackend.dtos.response.TravelDocumentResponseDTO;
 import com.example.hrmsbackend.dtos.response.TravelPlanResponseDTO;
@@ -59,6 +60,11 @@ public class TravelPlanController {
             @PathVariable("employeeId") Long employeeId
     ) {
         return ResponseEntity.ok(ResponseUtil.success(travelPlanService.getDocuments(travelPlanId, employeeId), "Document fetched successfully", 200));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<MyTravelsResponseDTO>> getMyTravels(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ResponseUtil.success(travelPlanService.getMyTravels(userDetails), "My travels fetched successfully", 200));
     }
 
     @PostMapping(value = "/{travelPlanId}/employee/{employeeId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

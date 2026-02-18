@@ -186,6 +186,20 @@ public class TravelPlanService {
         return travelPlan;
     }
 
+    public MyTravelsResponseDTO getMyTravels(CustomUserDetails userDetails) {
+        Employee employee = employeeRepo.findByEmail(userDetails.getUsername());
+        if (employee == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        
+        List<TravelPlan> travelPlans = travelPlanRepo.findByEmployeeOrderByStartDateDesc(employee);
+        
+        MyTravelsResponseDTO response = new MyTravelsResponseDTO();
+        response.setEmployee(entityMapper.toEmployeeSummaryDTO(employee));
+        response.setTravelPlans(entityMapper.toTravelPlanResponseDTOListWithoutEmployees(travelPlans));
+        return response;
+    }
+
     private @NonNull Employee getEmployee(Long employeeId) {
         Employee employee = employeeRepo.findById(employeeId).orElse(null);
         if (employee == null) {
