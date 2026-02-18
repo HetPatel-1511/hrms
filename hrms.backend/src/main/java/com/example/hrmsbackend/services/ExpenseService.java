@@ -8,10 +8,7 @@ import com.example.hrmsbackend.dtos.response.ExpenseResponseDTO;
 import com.example.hrmsbackend.entities.*;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
-import com.example.hrmsbackend.repos.EmployeeRepo;
-import com.example.hrmsbackend.repos.ExpenseRepo;
-import com.example.hrmsbackend.repos.TravelPlanEmployeeRepo;
-import com.example.hrmsbackend.repos.TravelPlanRepo;
+import com.example.hrmsbackend.repos.*;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +32,10 @@ public class ExpenseService {
     private EmailService emailService;
     private EmployeeRepo employeeRepo;
     private TravelPlanRepo travelPlanRepo;
-
-    @Value("${hr.email}")
-    private String hrEmail;
+    private ConfigurationRepo configurationRepo;
 
     @Autowired
-    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo, TravelPlanRepo travelPlanRepo) {
+    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo, TravelPlanRepo travelPlanRepo, ConfigurationRepo configurationRepo) {
         this.expenseRepo = expenseRepo;
         this.travelPlanEmployeeRepo = travelPlanEmployeeRepo;
         this.mediaService = mediaService;
@@ -48,6 +43,7 @@ public class ExpenseService {
         this.emailService = emailService;
         this.employeeRepo = employeeRepo;
         this.travelPlanRepo = travelPlanRepo;
+        this.configurationRepo = configurationRepo;
     }
 
     @Transactional
@@ -215,8 +211,14 @@ public class ExpenseService {
                     " for travel to " + expense.getTravelPlanEmployee().getTravelPlan().getPlace() +
                     ". Description: " + expense.getDescription();
 
+
             com.example.hrmsbackend.dtos.request.EmailDetailsDTO emailDetails = new com.example.hrmsbackend.dtos.request.EmailDetailsDTO();
-            emailDetails.setRecipient(hrEmail);
+
+            Configuration hrEmailConfig = configurationRepo.findByConfigKey("hr_email").orElse(null);
+            if (hrEmailConfig != null) {
+                emailDetails.setRecipient(hrEmailConfig.getConfigValue());
+            }
+
             emailDetails.setSubject(subject);
             emailDetails.setMsgBody(body);
             emailDetails.setAttachment(null);
