@@ -150,9 +150,7 @@ public class TravelPlanService {
         travelPlanEmployee.setEmployee(employeeRepo.findById(employeeId).orElse(null));
         travelPlanEmployee.setTravelPlan(travelPlanRepo.findById(travelPlanId).orElse(null));
 
-        Example<TravelPlanEmployee> example = Example.of(travelPlanEmployee);
-
-        TravelPlanEmployee travelPlanEmployee1 = travelPlanEmployeeRepo.findOne(example).orElse(null);
+        TravelPlanEmployee travelPlanEmployee1 = travelPlanEmployeeRepo.findByTravelPlanAndEmployee(travelPlanEmployee.getTravelPlan(), travelPlanEmployee.getEmployee()).orElse(null);
         if (travelPlanEmployee1 == null) {
             throw new ResourceNotFoundException("Travel plan doesn't exist");
         }
