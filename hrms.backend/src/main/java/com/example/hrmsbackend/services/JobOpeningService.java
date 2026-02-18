@@ -102,7 +102,7 @@ public class JobOpeningService {
     }
 
     public List<JobOpeningResponseDTO> getAllJobOpenings() {
-        List<JobOpening> jobOpenings = jobOpeningRepo.findAll();
+        List<JobOpening> jobOpenings = jobOpeningRepo.findAllByOrderByCreatedAtDesc();
         return entityMapper.toJobOpeningResponseDTOList(jobOpenings);
     }
 }

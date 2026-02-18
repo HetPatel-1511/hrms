@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface JobOpeningRepo extends JpaRepository<JobOpening, Long> {
-
+    List<JobOpening> findAllByOrderByCreatedAtDesc();
 }

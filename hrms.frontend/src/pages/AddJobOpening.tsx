@@ -38,7 +38,7 @@ const AddJobOpening = () => {
 
     const employeeOptions = employeesData?.data?.map((employee: any) => ({
         value: employee.email,
-        label: employee.name,
+        label: employee.name+` (${employee.email})`,
         id: employee.id
     })) || [];
 

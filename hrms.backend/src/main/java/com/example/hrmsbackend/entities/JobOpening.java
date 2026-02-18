@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -34,6 +36,9 @@ public class JobOpening {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_description_media_id")
     private Media descriptionMedia;
+
+    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "jobOpening", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<JobOpeningCvReviewer> cvReviewers;
@@ -110,5 +115,13 @@ public class JobOpening {
 
     public void setReferals(List<Referal> referals) {
         this.referals = referals;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
