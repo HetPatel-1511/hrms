@@ -11,6 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -30,7 +31,8 @@ public class EmailService {
         this.javaMailSender = javaMailSender;
     }
 
-    public String sendSimpleMail(EmailDetailsDTO details)
+    @Async
+    public void sendSimpleMail(EmailDetailsDTO details)
     {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -41,16 +43,16 @@ public class EmailService {
             mailMessage.setSubject(details.getSubject());
 
             javaMailSender.send(mailMessage);
-            return "Mail Sent Successfully...";
+            return;
         }
 
         catch (Exception e) {
-            return "Error while Sending Mail";
+            return;
         }
     }
 
-    public String
-    sendMailWithAttachment(EmailDetailsDTO details)
+    @Async
+    public void sendMailWithAttachment(EmailDetailsDTO details)
     {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
@@ -73,13 +75,13 @@ public class EmailService {
             mimeMessageHelper.addAttachment(resource.getFilename(), resource);
 
             javaMailSender.send(mimeMessage);
-            return "Mail sent Successfully";
+            return;
         }
 
         catch (MessagingException e) {
-            return "Error while sending mail!!!";
+            return;
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            return;
         }
     }
 }
