@@ -126,7 +126,9 @@ public class EntityMapper {
 
     public ExpenseResponseDTO toExpenseResponseDTO(Expense expense) {
         if (expense == null) return null;
-        return modelMapper.map(expense, ExpenseResponseDTO.class);
+        ExpenseResponseDTO dto = modelMapper.map(expense, ExpenseResponseDTO.class);
+        dto.setExpenseMedias(expense.getExpenseMedias().stream().map(em->toMediaResponseDTO(em.getExpenseMedias())).toList());
+        return dto;
     }
 
     public EmployeeManagerDetailsResponseDTO toEmployeeManagerDetailsResponseDTO(Employee employee) {

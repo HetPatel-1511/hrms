@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,14 +54,34 @@ public class ExpenseService {
     public ExpenseResponseDTO create(ExpenseCreateRequestDTO dto, CustomUserDetails userDetails) {
         Result result = getTravelPlanEmployeeDetails(dto.getTravelPlanId(), dto.getEmployeeId());
         TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(result.travelPlanEmployeeId);
+
         validateSubmissionWindow(travelPlanEmployee);
 
-        Media media = uploadProofFile(dto.getExpenseMedia(), userDetails);
+        Expense expense = getExpense(dto, travelPlanEmployee);
+        saveMedia(dto, userDetails, expense);
 
-        Expense expense = addExpense(dto, travelPlanEmployee, media);
-        expenseRepo.save(expense);
+        Expense savedExpense = expenseRepo.save(expense);
 
-        return entityMapper.toExpenseResponseDTO(expense);
+        return entityMapper.toExpenseResponseDTO(savedExpense);
+    }
+
+    private void saveMedia(ExpenseCreateRequestDTO dto, CustomUserDetails userDetails, Expense expense) {
+        for(MultipartFile uploadedExpenseMedia: dto.getExpenseMedias()) {
+            Media media = uploadProofFile(uploadedExpenseMedia, userDetails);
+            ExpenseMedia newExpenseMedia = new ExpenseMedia();
+            newExpenseMedia.setExpenseMedias(media);
+            expense.addExpenseMedia(newExpenseMedia);
+        }
+    }
+
+    private static @NonNull Expense getExpense(ExpenseCreateRequestDTO dto, TravelPlanEmployee travelPlanEmployee) {
+        Expense expense = new Expense();
+        expense.setTravelPlanEmployee(travelPlanEmployee);
+        expense.setAmount(dto.getAmount());
+        expense.setDescription(dto.getDescription());
+        expense.setStatus("Draft");
+        expense.setCreatedAt(LocalDateTime.now());
+        return expense;
     }
 
     @Transactional
@@ -250,16 +271,4 @@ public class ExpenseService {
         }
         return mediaService.upload(proofFile, "expense-proof", userDetails);
     }
-
-    private @NonNull Expense addExpense(ExpenseCreateRequestDTO dto, TravelPlanEmployee travelPlanEmployee, Media media) {
-        Expense expense = new Expense();
-        expense.setTravelPlanEmployee(travelPlanEmployee);
-        expense.setExpenseMedia(media);
-        expense.setAmount(dto.getAmount());
-        expense.setDescription(dto.getDescription());
-        expense.setStatus("Draft");
-        expense.setCreatedAt(LocalDateTime.now());
-        return expense;
-    }
-
 }

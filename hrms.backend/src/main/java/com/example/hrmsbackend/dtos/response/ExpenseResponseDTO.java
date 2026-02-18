@@ -3,6 +3,7 @@ package com.example.hrmsbackend.dtos.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ExpenseResponseDTO {
     private Long id;
@@ -21,7 +22,7 @@ public class ExpenseResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime approvedAt;
 
-    private MediaResponseDTO expenseMedia;
+    private List<MediaResponseDTO> expenseMedias;
 
     private EmployeeSummaryDTO employee;
 
@@ -86,14 +87,6 @@ public class ExpenseResponseDTO {
         this.approvedAt = approvedAt;
     }
 
-    public MediaResponseDTO getExpenseMedia() {
-        return expenseMedia;
-    }
-
-    public void setExpenseMedia(MediaResponseDTO expenseMedia) {
-        this.expenseMedia = expenseMedia;
-    }
-
     public EmployeeSummaryDTO getEmployee() {
         return employee;
     }
@@ -116,5 +109,13 @@ public class ExpenseResponseDTO {
 
     public void setTravelPlan(TravelPlanSummaryResponseDTO travelPlan) {
         this.travelPlan = travelPlan;
+    }
+
+    public List<MediaResponseDTO> getExpenseMedias() {
+        return expenseMedias;
+    }
+
+    public void setExpenseMedias(List<MediaResponseDTO> expenseMedias) {
+        this.expenseMedias = expenseMedias;
     }
 }

@@ -16,6 +16,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/expenses")
 public class ExpenseController {
@@ -32,7 +34,7 @@ public class ExpenseController {
             @PathVariable("employeeId") String employeeId,
             @RequestPart("amount") String amount,
             @RequestPart("description") String description,
-            @RequestPart("expenseMedia") MultipartFile expenseMedia,
+            @RequestPart("expenseMedias") List<MultipartFile> expenseMedias,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         ExpenseCreateRequestDTO dto = new ExpenseCreateRequestDTO();
@@ -40,7 +42,7 @@ public class ExpenseController {
         dto.setEmployeeId(Long.parseLong(employeeId));
         dto.setAmount(Integer.parseInt(amount));
         dto.setDescription(description);
-        dto.setExpenseMedia(expenseMedia);
+        dto.setExpenseMedias(expenseMedias);
 
         return ResponseEntity.ok(ResponseUtil.success(expenseService.create(dto, userDetails), "Expense created successfully", 201));
     }

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public class ExpenseCreateRequestDTO {
     @NotNull(groups = Create.class, message = "Travel plan ID is required")
     private Long travelPlanId;
@@ -20,7 +22,7 @@ public class ExpenseCreateRequestDTO {
     private String description;
 
     @NotNull(groups = Create.class, message = "Proof file is mandatory")
-    private MultipartFile expenseMedia;
+    private List<MultipartFile> expenseMedias;
 
     public Integer getAmount() {
         return amount;
@@ -38,14 +40,6 @@ public class ExpenseCreateRequestDTO {
         this.description = description;
     }
 
-    public MultipartFile getExpenseMedia() {
-        return expenseMedia;
-    }
-
-    public void setExpenseMedia(MultipartFile expenseMedia) {
-        this.expenseMedia = expenseMedia;
-    }
-
     public Long getTravelPlanId() {
         return travelPlanId;
     }
@@ -60,5 +54,13 @@ public class ExpenseCreateRequestDTO {
 
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
+    }
+
+    public List<MultipartFile> getExpenseMedias() {
+        return expenseMedias;
+    }
+
+    public void setExpenseMedias(List<MultipartFile> expenseMedias) {
+        this.expenseMedias = expenseMedias;
     }
 }

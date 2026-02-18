@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "expenses")
@@ -15,9 +17,8 @@ public class Expense {
     private Long id;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "fk_expense_media_id", nullable = false)
-    private Media expenseMedia;
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExpenseMedia> expenseMedias = new ArrayList<>();
 
     @Positive
     private Integer amount;
@@ -49,14 +50,6 @@ public class Expense {
 
     public Long getId() {
         return id;
-    }
-
-    public Media getExpenseMedia() {
-        return expenseMedia;
-    }
-
-    public void setExpenseMedia(Media expenseMedia) {
-        this.expenseMedia = expenseMedia;
     }
 
     public Integer getAmount() {
@@ -121,5 +114,18 @@ public class Expense {
 
     public void setStatusChangedBy(Employee statusChangedBy) {
         this.statusChangedBy = statusChangedBy;
+    }
+
+    public List<ExpenseMedia> getExpenseMedias() {
+        return expenseMedias;
+    }
+
+    public void setExpenseMedias(List<ExpenseMedia> expenseMedias) {
+        this.expenseMedias = expenseMedias;
+    }
+
+    public void addExpenseMedia(ExpenseMedia expenseMedia) {
+        expenseMedias.add(expenseMedia);
+        expenseMedia.setExpense(this);
     }
 }
