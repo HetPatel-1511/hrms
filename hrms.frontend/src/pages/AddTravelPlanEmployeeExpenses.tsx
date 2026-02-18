@@ -21,12 +21,14 @@ const AddTravelPlanEmployeeExpenses = () => {
 
         formData.append('amount', data.amount);
         formData.append('description', data.description);
-        for (let i = 0; i < data.expenseMedias.length; i++) {
-            formData.append('expenseMedias', data.expenseMedias[i]);
-        }
-        data = { ...data, expenseMedias: Array.from(data.expenseMedias) };
         
-        addTravelPlanExpense.mutate({travelPlanId, employeeId, data});
+        if (data.expenseMedias && data.expenseMedias.length > 0) {
+            for (let i = 0; i < data.expenseMedias.length; i++) {
+                formData.append('expenseMedias', data.expenseMedias[i]);
+            }
+        }
+        
+        addTravelPlanExpense.mutate({travelPlanId, employeeId, data: formData});
     };
 
     useEffect(() => {

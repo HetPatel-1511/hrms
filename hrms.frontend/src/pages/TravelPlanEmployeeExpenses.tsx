@@ -51,7 +51,13 @@ const TravelPlanEmployeeExpenses = () => {
                         month: 'short',
                         day: 'numeric'
                       })}</p>
-                      <a href={expense?.expenseMedia?.url} className="w-full h-full text-blue-800 object-cover">{expense?.expenseMedia?.originalName}</a>
+                      <div className='mt-2'>
+                      {expense?.expenseMedias?.map((media: any, index: number) => (
+                        <div key={index} className="">
+                          <a href={media?.url} className="w-full h-full text-blue-800 object-cover block">{media?.originalName}</a>
+                        </div>
+                      ))}
+                      </div>
                     </>
                 </div>
               </div>
