@@ -17,7 +17,15 @@ const AddTravelPlanEmployeeExpenses = () => {
     const addTravelPlanExpense = useAddTravelPlanExpenseMutation()
     
     const onSubmit = (data: any) => {
-        data = { ...data, expenseMedia: data.expenseMedia[0] };
+        const formData = new FormData();
+
+        formData.append('amount', data.amount);
+        formData.append('description', data.description);
+        for (let i = 0; i < data.expenseMedias.length; i++) {
+            formData.append('expenseMedias', data.expenseMedias[i]);
+        }
+        data = { ...data, expenseMedias: Array.from(data.expenseMedias) };
+        
         addTravelPlanExpense.mutate({travelPlanId, employeeId, data});
     };
 
@@ -56,7 +64,8 @@ const AddTravelPlanEmployeeExpenses = () => {
                     <FormInput
                         type="file"
                         label="Expense Proof"
-                        id="expenseMedia"
+                        id="expenseMedias"
+                        multiple={true}
                         placeholder=""
                         register={register}
                         errors={errors}

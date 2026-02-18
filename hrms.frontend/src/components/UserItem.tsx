@@ -6,15 +6,15 @@ import Button from './Button'
 const UserItem = ({ employee, showButtons=false }: any) => {
     return (
             <>
-            <div className="mr-4 grid place-items-center">
-                <UserAvatar className="h-12 w-12" user={{ image: employee?.profileMedia?.url }} />
+            <div className="">
+                <UserAvatar className="h-12 w-12 max-w-none mr-2" user={{ image: employee?.profileMedia?.url }} />
             </div>
             <div>
                 <div className='flex items-center'>
-                    <h6 className="text-slate-800 font-medium">
+                    <h6 className="text-slate-800 text-nowrap font-medium">
                         {employee?.name}
                     </h6>
-                    <p className="text-slate-500 text-sm ml-2">
+                    <p className="text-slate-500 text-sm ml-2 text-nowrap">
                         ({employee?.email})
                     </p>
                 </div>

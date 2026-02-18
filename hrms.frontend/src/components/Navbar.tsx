@@ -1,10 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router'
-import { logout } from '../redux/slices/userSlice'
-import { useDispatch } from 'react-redux'
+import { logout, selectUser } from '../redux/slices/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import UserAvatar from './UserAvatar'
+import { BellAlertIcon, BellIcon } from '@heroicons/react/24/solid'
 
 const Navbar = React.memo(({show=true}:any) => {
     const dispatch = useDispatch()
+    const user = useSelector(selectUser);
     return (
         <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
             <div className="flex flex-wrap justify-between items-center">
@@ -56,23 +59,13 @@ const Navbar = React.memo(({show=true}:any) => {
                     <button
                         type="button"
                         data-dropdown-toggle="notification-dropdown"
-                        className="p-2 mr-1 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                        className="p-2 mr-1 text-gray-500 rounded-lg dark:text-gray-400 cursor-pointer"
                     >
                         <span className="sr-only">View notifications</span>
-                        <svg
-                            aria-hidden="true"
-                            className="w-6 h-6"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
-                            ></path>
-                        </svg>
+                        <BellIcon className='w-6 h-6' />
                     </button>
                     <div
-                        className="hidden overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:divide-gray-600 dark:bg-gray-700 rounded-xl"
+                        className="hidden absolute top-10 right-26 overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:divide-gray-600 dark:bg-gray-700 rounded-xl"
                         id="notification-dropdown"
                     >
                         <div
@@ -330,17 +323,13 @@ const Navbar = React.memo(({show=true}:any) => {
                     </div>
                     <button
                         type="button"
-                        className="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                        className="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 cursor-pointer"
                         id="user-menu-button"
                         aria-expanded="false"
                         data-dropdown-toggle="dropdown"
                     >
                         <span className="sr-only">Open user menu</span>
-                        <img
-                            className="w-8 h-8 rounded-full"
-                            src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png"
-                            alt="user photo"
-                        />
+                        <UserAvatar user={{image: user?.profileMedia?.url, name: user?.name}} className="w-6 h-6" bgColor="text-gray-400" />
                     </button>
                     <div
                         className="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"

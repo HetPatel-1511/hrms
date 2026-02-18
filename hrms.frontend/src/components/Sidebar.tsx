@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import SidebarListButton from './SidebarListButton'
-import { AdjustmentsHorizontalIcon, ArrowRightEndOnRectangleIcon, CameraIcon, HomeIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { AdjustmentsHorizontalIcon, ArrowRightEndOnRectangleIcon, BriefcaseIcon, CameraIcon, HomeIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { href } from 'react-router'
 
 const Sidebar = React.memo(() => {
@@ -45,7 +45,7 @@ const Sidebar = React.memo(() => {
             title: "Job Openings",
             isDropdown: true,
             href: "/job-openings",
-            Icon: <AdjustmentsHorizontalIcon className='h-6 w-6' />,
+            Icon: <BriefcaseIcon className='h-6 w-6' />,
             dropdown: [
                 {
                     title: "Add New",

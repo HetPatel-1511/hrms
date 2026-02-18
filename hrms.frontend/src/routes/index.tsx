@@ -18,6 +18,7 @@ import AddJobOpening from "../pages/AddJobOpening";
 import SingleJobOpening from "../pages/SingleJobOpening";
 import ShareJob from "../pages/ShareJob";
 import ReferFriend from "../pages/ReferFriend";
+import NotFound404 from "../pages/NotFound404";
 
 export default [
     {
@@ -121,5 +122,9 @@ export default [
                 element: <Login />
             }
         ]
+    },
+    {
+        path: "*",
+        element: <NotFound404 />
     }
 ]
