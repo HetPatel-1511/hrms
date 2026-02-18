@@ -107,7 +107,7 @@ const AddTravelPlan = () => {
                     <FormInput
                         type="multi-select"
                         label="Travelling Employees"
-                        options={data.data.map((e: any) => { return { value: e.id, label: e.email } })}
+                        options={data.data.map((e: any) => { return { value: e.id, label: e.name+` (${e.email})` } })}
                         id="employees"
                         register={register}
                         errors={errors}

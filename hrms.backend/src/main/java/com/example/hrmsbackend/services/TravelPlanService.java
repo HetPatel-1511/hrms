@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,11 @@ public class TravelPlanService {
         if (dto.getEndDate().isBefore(dto.getStartDate())){
             throw new RuntimeException("Invalid start and end date");
         }
+
+        if (dto.getStartDate().isBefore(LocalDate.now())){
+            throw new RuntimeException("Start date should be in the future.");
+        }
+
         TravelPlan travelPlan = new TravelPlan();
         travelPlan.setPlace(dto.getPlace());
         travelPlan.setPurpose(dto.getPurpose());
