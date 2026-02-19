@@ -35,3 +35,13 @@ export const addTravelPlanExpense = async ({travelPlanId, employeeId, data}: any
     const res = await axios.post(`expenses/travel-plan/${travelPlanId}/employee/${employeeId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
     return res.data
 }
+
+export const changeTravelPlanExpenseStatus = async ({expenseId, data}: any) => {
+    const res = await axios.put(`expenses/${expenseId}/status`, data);
+    return res.data
+}
+
+export const fetchTravelPlanById = async (expenseId: any) => {
+    const res = await axios.get(`expenses/${expenseId}`);
+    return res.data
+}

@@ -183,6 +183,13 @@ public class ExpenseService {
         return response;
     }
 
+    public ExpenseResponseDTO getExpensesById(Long expenseId, CustomUserDetails userDetails) {
+        Expense expense = expenseRepo.findById(expenseId).orElseThrow(()->new ResourceNotFoundException("Expense not found."));
+        validateAccessPermission(expense.getTravelPlanEmployee(), userDetails);
+
+        return entityMapper.toExpenseResponseDTO(expense);
+    }
+
     private List<Expense> getExpenseListBasedOnValidation(AccessValidationResult accessValidationResult, Result result) {
         List<Expense> expenses;
         if (accessValidationResult.isOwner) {

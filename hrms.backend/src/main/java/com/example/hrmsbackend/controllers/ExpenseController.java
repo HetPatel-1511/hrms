@@ -59,4 +59,12 @@ public class ExpenseController {
     ) {
         return ResponseEntity.ok(ResponseUtil.success(expenseService.getExpensesByTravelPlanEmployee(travelPlanId, employeeId, userDetails), "Expenses fetched successfully", 200));
     }
+
+    @GetMapping("/{expenseId}")
+    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> getExpensesById(
+            @PathVariable Long expenseId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(ResponseUtil.success(expenseService.getExpensesById(expenseId, userDetails), "Expense fetched successfully", 200));
+    }
 }

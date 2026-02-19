@@ -7,7 +7,7 @@ const UserItem = ({ employee, showButtons=false }: any) => {
     return (
             <>
             <div className="">
-                <UserAvatar className="h-12 w-12 max-w-none mr-2" user={{ image: employee?.profileMedia?.url }} />
+                <UserAvatar className="h-10 w-10 max-w-none mr-2" user={{ image: employee?.profileMedia?.url }} />
             </div>
             <div>
                 <div className='flex items-center'>

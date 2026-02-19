@@ -49,6 +49,10 @@ export default [
                         element: <TravelPlanEmployeeExpenses />,
                     },
                     {
+                        path: ":travelPlanId/employee/:employeeId/expenses/:expenseId/draft",
+                        element: <AddTravelPlanEmployeeExpenses isDraftScreen={true} />,
+                    },
+                    {
                         path: ":travelPlanId/employee/:employeeId/expenses/add",
                         element: <AddTravelPlanEmployeeExpenses />,
                     },
