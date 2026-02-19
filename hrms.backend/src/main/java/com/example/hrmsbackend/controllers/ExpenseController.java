@@ -32,17 +32,11 @@ public class ExpenseController {
     public ResponseEntity<ApiResponse<ExpenseResponseDTO>> create(
             @PathVariable("travelPlanId") String travelPlanId,
             @PathVariable("employeeId") String employeeId,
-            @RequestPart("amount") String amount,
-            @RequestPart("description") String description,
-            @RequestPart("expenseMedias") List<MultipartFile> expenseMedias,
+            @ModelAttribute @Valid ExpenseCreateRequestDTO dto,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        ExpenseCreateRequestDTO dto = new ExpenseCreateRequestDTO();
         dto.setTravelPlanId(Long.parseLong(travelPlanId));
         dto.setEmployeeId(Long.parseLong(employeeId));
-        dto.setAmount(Integer.parseInt(amount));
-        dto.setDescription(description);
-        dto.setExpenseMedias(expenseMedias);
 
         return ResponseEntity.ok(ResponseUtil.success(expenseService.create(dto, userDetails), "Expense created successfully", 201));
     }

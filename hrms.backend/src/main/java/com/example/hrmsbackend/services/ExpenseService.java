@@ -11,7 +11,6 @@ import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.*;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,9 +32,10 @@ public class ExpenseService {
     private EmployeeRepo employeeRepo;
     private TravelPlanRepo travelPlanRepo;
     private ConfigurationRepo configurationRepo;
+    private ExpenseMediaRepo expenseMediaRepo;
 
     @Autowired
-    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo, TravelPlanRepo travelPlanRepo, ConfigurationRepo configurationRepo) {
+    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo, TravelPlanRepo travelPlanRepo, ConfigurationRepo configurationRepo, ExpenseMediaRepo expenseMediaRepo) {
         this.expenseRepo = expenseRepo;
         this.travelPlanEmployeeRepo = travelPlanEmployeeRepo;
         this.mediaService = mediaService;
@@ -44,29 +44,100 @@ public class ExpenseService {
         this.employeeRepo = employeeRepo;
         this.travelPlanRepo = travelPlanRepo;
         this.configurationRepo = configurationRepo;
+        this.expenseMediaRepo = expenseMediaRepo;
     }
 
     @Transactional
     public ExpenseResponseDTO create(ExpenseCreateRequestDTO dto, CustomUserDetails userDetails) {
         Result result = getTravelPlanEmployeeDetails(dto.getTravelPlanId(), dto.getEmployeeId());
-        TravelPlanEmployee travelPlanEmployee = getTravelPlanEmployee(result.travelPlanEmployeeId);
+        TravelPlanEmployee travelPlanEmployee = result.travelPlanEmployee;
+        Boolean exists = false;
+        Expense expense;
+        if (dto.getExpenseId() != null) {
+            expense = getExpense(dto.getExpenseId());
+            exists = true;
+            validateExpenseOwnership(expense, travelPlanEmployee);
+            validateExpenseModifiable(expense);
+        } else {
+            expense = new Expense();
+            expense.setTravelPlanEmployee(travelPlanEmployee);
+        }
+
+        expense.setAmount(dto.getAmount());
+        expense.setDescription(dto.getDescription());
+        expense.setStatus(dto.getStatus());
 
         validateSubmissionWindow(travelPlanEmployee);
 
-        Expense expense = getExpense(dto, travelPlanEmployee);
-        saveMedia(dto, userDetails, expense);
+        if ("Submitted".equals(dto.getStatus())) {
+            validateSubmittedExpenseHasProof(dto.getExistingMediaIdsToKeep(), dto.getExpenseMedias());
+            expense.setCreatedAt(LocalDateTime.now());
+            sendSubmissionNotification(expense);
+        }
+
+        handleMediaFiles(expense, dto.getExistingMediaIdsToKeep(), dto.getExpenseMedias(), userDetails, exists);
 
         Expense savedExpense = expenseRepo.save(expense);
-
         return entityMapper.toExpenseResponseDTO(savedExpense);
     }
 
-    private void saveMedia(ExpenseCreateRequestDTO dto, CustomUserDetails userDetails, Expense expense) {
-        for(MultipartFile uploadedExpenseMedia: dto.getExpenseMedias()) {
-            Media media = uploadProofFile(uploadedExpenseMedia, userDetails);
-            ExpenseMedia newExpenseMedia = new ExpenseMedia();
-            newExpenseMedia.setExpenseMedias(media);
-            expense.addExpenseMedia(newExpenseMedia);
+    @Transactional
+    private void handleMediaFiles(Expense expense, List<Long> existingMediaIdsToKeep, List<MultipartFile> newMediaFiles, CustomUserDetails userDetails, Boolean exists) {
+        if (existingMediaIdsToKeep == null) {
+            existingMediaIdsToKeep = new ArrayList<>();
+        }
+        if (newMediaFiles == null) {
+            newMediaFiles = new ArrayList<>();
+        }
+
+        List<ExpenseMedia> currentMedia;
+        if (exists) {
+            currentMedia = expenseMediaRepo.findByExpense(expense);
+        } else {
+            currentMedia = expense.getExpenseMedias();
+        }
+        for (ExpenseMedia expenseMedia : currentMedia) {
+            if (!existingMediaIdsToKeep.contains(expenseMedia.getMedia().getId())) {
+                System.out.println(mediaService.delete(expenseMedia.getMedia().getId()));
+                expense.getExpenseMedias().remove(expenseMedia);
+                expenseMediaRepo.delete(expenseMedia);
+            }
+        }
+
+        for (MultipartFile newFile : newMediaFiles) {
+            if (newFile != null && !newFile.isEmpty()) {
+                Media media = mediaService.upload(newFile, "expense-proof", userDetails);
+                ExpenseMedia expenseMedia = new ExpenseMedia();
+                expenseMedia.setExpense(expense);
+                expenseMedia.setMedia(media);
+                expense.addExpenseMedia(expenseMedia);
+            }
+        }
+    }
+
+
+    private void validateExpenseOwnership(Expense expense, TravelPlanEmployee travelPlanEmployee) {
+        if (!expense.getTravelPlanEmployee().getId().equals(travelPlanEmployee.getId())) {
+            throw new RuntimeException("Expense does not belong to the specified travel plan and employee");
+        }
+    }
+
+    private void validateExpenseModifiable(Expense expense) {
+        if (!"Draft".equals(expense.getStatus())) {
+            throw new RuntimeException("Cannot modify expense with status: " + expense.getStatus());
+        }
+    }
+
+    private void validateSubmittedExpenseHasProof(List<Long> existingMediaIdsToKeep, List<MultipartFile> newMediaFiles) {
+        int totalProofs = 0;
+        if (existingMediaIdsToKeep != null) {
+            totalProofs += existingMediaIdsToKeep.size();
+        }
+        if (newMediaFiles != null) {
+            totalProofs += (int) newMediaFiles.stream().filter(file -> !file.isEmpty()).count();
+        }
+        if (totalProofs == 0) {
+            throw new RuntimeException("At least one proof document is required when submitting expense");
         }
     }
 
@@ -99,9 +170,10 @@ public class ExpenseService {
 
     public ExpenseListResponseDTO getExpensesByTravelPlanEmployee(Long travelPlanId,Long employeeId, CustomUserDetails userDetails) {
         Result result = getTravelPlanEmployeeDetails(travelPlanId, employeeId);
-        validateAccessPermission(result.travelPlanEmployee(), userDetails);
+        AccessValidationResult accessValidationResult = validateAccessPermission(result.travelPlanEmployee(), userDetails);
 
-        List<Expense> expenses = expenseRepo.findByTravelPlanEmployeeId(result.travelPlanEmployeeId());
+        List<Expense> expenses = getExpenseListBasedOnValidation(accessValidationResult, result);
+
         List<ExpenseResponseDTO> expenseDTOs = entityMapper.toExpenseResponseDTOList(expenses);
 
         AmountResult amountResult = getAmountBreakdown(expenseDTOs);
@@ -109,6 +181,16 @@ public class ExpenseService {
         ExpenseListResponseDTO response = getExpenseListResponseDTO(expenseDTOs, amountResult, result);
 
         return response;
+    }
+
+    private List<Expense> getExpenseListBasedOnValidation(AccessValidationResult accessValidationResult, Result result) {
+        List<Expense> expenses;
+        if (accessValidationResult.isOwner) {
+            expenses = expenseRepo.findByTravelPlanEmployeeId(result.travelPlanEmployeeId());
+        } else {
+            expenses = expenseRepo.findByTravelPlanEmployeeIdExcludingStatus(result.travelPlanEmployeeId(), "DRAFT");
+        }
+        return expenses;
     }
 
     private @NonNull ExpenseListResponseDTO getExpenseListResponseDTO(List<ExpenseResponseDTO> expenseDTOs, AmountResult amountResult, Result result) {
@@ -139,7 +221,7 @@ public class ExpenseService {
         Map<LocalDate, DailyAmountResult> dailyTotals = expenseDTOs.stream()
                 .collect(Collectors.toMap(
                         dto -> dto.getCreatedAt().toLocalDate(),
-                        dto -> new DailyAmountResult(dto.getAmount(), dto.getEmployee().getMaxAmountPerDay()), // Value mapper: initial summary
+                        dto -> new DailyAmountResult(dto.getAmount(), dto.getEmployee().getMaxAmountPerDay()),
                         (DailyAmountResult existingSummary,DailyAmountResult newSummary) -> new DailyAmountResult(
                                 existingSummary.totalAmount + newSummary.totalAmount,
                                 newSummary.maxAmountPerDay
@@ -160,7 +242,9 @@ public class ExpenseService {
     private record DailyAmountResult(Integer totalAmount, Integer maxAmountPerDay) {
     }
 
-    private void validateAccessPermission(TravelPlanEmployee travelPlanEmployee, CustomUserDetails userDetails) {
+    public record AccessValidationResult(boolean isHR, boolean isOwner) {}
+
+    private AccessValidationResult validateAccessPermission(TravelPlanEmployee travelPlanEmployee, CustomUserDetails userDetails) {
         boolean isHR = userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("HR"));
         
@@ -169,6 +253,7 @@ public class ExpenseService {
         if (!isHR && !isOwner) {
             throw new RuntimeException("Unauthorized access to expenses");
         }
+        return new AccessValidationResult(isHR, isOwner);
     }
 
     private @NonNull Expense getExpense(Long expenseId) {

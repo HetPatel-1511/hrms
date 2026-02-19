@@ -15,6 +15,8 @@ public class ExpenseCreateRequestDTO {
     @NotNull(groups = Create.class, message = "Employee ID is required")
     private Long employeeId;
 
+    private Long expenseId;
+
     @Positive(groups = Create.class, message = "Amount must be positive")
     private Integer amount;
 
@@ -23,6 +25,11 @@ public class ExpenseCreateRequestDTO {
 
     @NotNull(groups = Create.class, message = "Proof file is mandatory")
     private List<MultipartFile> expenseMedias;
+
+    @NotNull(groups = Create.class, message = "Status is mandatory")
+    private  String status = "Draft";
+
+    private  List<Long> existingMediaIdsToKeep;
 
     public Integer getAmount() {
         return amount;
@@ -62,5 +69,29 @@ public class ExpenseCreateRequestDTO {
 
     public void setExpenseMedias(List<MultipartFile> expenseMedias) {
         this.expenseMedias = expenseMedias;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public List<Long> getExistingMediaIdsToKeep() {
+        return existingMediaIdsToKeep;
+    }
+
+    public void setExistingMediaIdsToKeep(List<Long> existingMediaIdsToKeep) {
+        this.existingMediaIdsToKeep = existingMediaIdsToKeep;
+    }
+
+    public Long getExpenseId() {
+        return expenseId;
+    }
+
+    public void setExpenseId(Long expenseId) {
+        this.expenseId = expenseId;
     }
 }

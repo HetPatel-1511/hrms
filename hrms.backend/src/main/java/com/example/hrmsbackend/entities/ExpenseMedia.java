@@ -12,7 +12,7 @@ public class ExpenseMedia {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_media_id", nullable = false)
-    private Media expenseMedias;
+    private Media media;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,11 +35,11 @@ public class ExpenseMedia {
         this.expense = expense;
     }
 
-    public Media getExpenseMedias() {
-        return expenseMedias;
+    public Media getMedia() {
+        return media;
     }
 
-    public void setExpenseMedias(Media expenseMedias) {
-        this.expenseMedias = expenseMedias;
+    public void setMedia(Media media) {
+        this.media = media;
     }
 }
