@@ -5,9 +5,13 @@ import ServerError from '../components/ServerError'
 import useTravelPlanQuery from '../query/queryHooks/useTravelPlanQuery'
 import { Link } from 'react-router'
 import TravelPlanItem from '../components/TravelPlanItem'
+import { useAuthorization } from '../hooks/useAuthorization'
 
-const TravelPlan = () => {
-    const { data, isLoading, isSuccess, isError, error } = useTravelPlanQuery()
+const TravelPlan = ({isMy= false}: any) => {
+    const { hasRole } = useAuthorization()
+    const canAccessAllTravelPlans = (!isMy && hasRole(["HR"]))
+    const { data, isLoading, isSuccess, isError, error } = useTravelPlanQuery(canAccessAllTravelPlans)
+
     if (isLoading) {
         return <Loading />
     }
@@ -15,18 +19,19 @@ const TravelPlan = () => {
         return <ServerError />
     }
     if (isSuccess) {
+        const travelPlans = canAccessAllTravelPlans ? data?.data : data?.data?.travelPlans
         return (
             <div>
                 <h1 className='text-2xl font-bold mb-4'>Travel plans</h1>
-                <Button to={"add"}>Add</Button>
+                {hasRole(["HR"]) && <Button to={"add"}>Add</Button>}
                 <div className='mt-6'>
-                    {data.data && data.data.length > 0 ?
-                        data.data.map((travelPlan: any) => {
+                    {travelPlans && travelPlans.length > 0 ?
+                        travelPlans.map((travelPlan: any) => {
                             return (
                                 <TravelPlanItem key={travelPlan.id} travelPlan={travelPlan} />
                             )
                         }) :
-                        <h1 className='text-4xl font-medium'>No Travel Positions</h1>
+                        <h1 className='text-xl font-medium'>No Travel Plans</h1>
                     }
                 </div>
             </div>

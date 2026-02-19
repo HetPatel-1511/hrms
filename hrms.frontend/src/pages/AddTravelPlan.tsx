@@ -60,6 +60,7 @@ const AddTravelPlan = () => {
 
     return (
         <div>
+            <h1 className='text-2xl font-bold mb-4'>Create travel plan</h1>
             <form className="">
                 <div className="mb-5">
                     <FormInput

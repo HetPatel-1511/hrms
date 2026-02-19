@@ -6,7 +6,7 @@ export const useAuthorization = () => {
 
   const hasRole = (requiredRoles: any) => {
     if (!user || !user.roles) return false;
-    return requiredRoles.some((role: any) => user.roles.includes(role));
+    return requiredRoles.some((role: any) => user.roles.some((roleObj: any) => role==roleObj.name));
   };
 
   const isOwner = (resourceOwnerId: any) => {

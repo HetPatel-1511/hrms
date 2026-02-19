@@ -6,8 +6,8 @@ export const addTravelPlan = async (data:any) => {
     return res.data
 }
 
-export const fetchTravelPlans = async () => {
-    const res = await axios.get("/travel-plans");
+export const fetchTravelPlans = async (fetchAll: boolean) => {
+    const res = await axios.get(`/travel-plans${fetchAll ? "" : "/me"}`);
     return res.data
 }
 

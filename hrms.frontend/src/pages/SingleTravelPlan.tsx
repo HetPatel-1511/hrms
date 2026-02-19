@@ -10,11 +10,13 @@ import formatDate from '../utils/formatDate'
 import UserPill from '../components/UserPill'
 import UserAvatar from '../components/UserAvatar'
 import UserItem from '../components/UserItem'
+import { useAuthorization } from '../hooks/useAuthorization'
 
 const SingleTravelPlan = () => {
     const { travelPlanId } = useParams()
 
     const { data, isLoading, isSuccess, isError, error } = useSingleTravelPlanQuery(travelPlanId)
+    const { canAccess } = useAuthorization();
 
     if (isLoading) {
         return <Loading />
@@ -102,9 +104,9 @@ const SingleTravelPlan = () => {
                                         <div
                                             key={travellingEmployee.id}
                                             
-                                            className="text-slate-800 flex w-full items-center rounded-md p-3 cursor-pointer transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
+                                            className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
                                         >
-                                            <UserItem employee={travellingEmployee} showButtons={true} />
+                                            <UserItem employee={travellingEmployee} showButtons={canAccess(["HR"], travellingEmployee.id)} />
                                         </div>
                                     ))}
                                 </nav>

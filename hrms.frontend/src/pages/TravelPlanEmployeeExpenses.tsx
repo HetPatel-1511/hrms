@@ -8,9 +8,11 @@ import ServerError from '../components/ServerError'
 import formatDate from '../utils/formatDate'
 import { CheckIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import useChangeTravelPlanExpenseStatusMutation from '../query/queryHooks/useChangeTravelPlanExpenseStatusMutation'
+import { useAuthorization } from '../hooks/useAuthorization'
 
 const TravelPlanEmployeeExpenses = () => {
   const { travelPlanId, employeeId } = useParams()
+  const { isOwner, hasRole } = useAuthorization()
   const { data, isSuccess, isLoading, isError, error } = useEmployeeTravelPlanExpensesQuery(travelPlanId, employeeId)
 
   const changeTravelPlanExpenseStatus = useChangeTravelPlanExpenseStatusMutation()
@@ -42,9 +44,9 @@ const TravelPlanEmployeeExpenses = () => {
           >
             ← Back to travel plan
           </Link>
-          <div className='m-4'>
+          {isOwner(travellingEmployee.id) && <div className='m-4'>
             <Button to={"add"}>Add</Button>
-          </div>
+          </div>}
           <div
             className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
           >
@@ -82,9 +84,9 @@ const TravelPlanEmployeeExpenses = () => {
                     </div>
                     <div className='flex justify-end mr-0'>
                       
-                      {expense.status == "Draft" && <Link to={`${expense.id}/draft`} className="flex cursor-pointer items-center mt-1 hover:bg-gray-100 p-1 rounded"><PencilIcon className='h-4 w-4 text-gray-500' /></Link>}
+                      {isOwner(travellingEmployee.id) && expense.status == "Draft" && <Link to={`${expense.id}/draft`} className="flex cursor-pointer items-center mt-1 hover:bg-gray-100 p-1 rounded"><PencilIcon className='h-4 w-4 text-gray-500' /></Link>}
                     </div>
-                      {expense.status == "Submitted" && 
+                      {hasRole(["HR"]) && expense.status == "Submitted" && 
                         <div className='flex items-center gap-2'>
                           <button onClick={() => handleStatusChange(expense.id, "Approved")} title='Approve' className="hover:bg-gray-100 rounded p-0 cursor-pointer items-center"><CheckIcon className='h-5 w-5 text-green-600' /></button>
                           <button onClick={() => handleStatusChange(expense.id, "Rejected")} title='Reject' className="hover:bg-gray-100 rounded p-0 cursor-pointer items-center"><XMarkIcon className='h-5 w-5 text-red-600' /></button>

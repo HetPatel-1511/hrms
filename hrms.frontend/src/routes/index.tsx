@@ -19,6 +19,7 @@ import SingleJobOpening from "../pages/SingleJobOpening";
 import ShareJob from "../pages/ShareJob";
 import ReferFriend from "../pages/ReferFriend";
 import NotFound404 from "../pages/NotFound404";
+import Authorize from "../components/Authorize";
 
 export default [
     {
@@ -29,12 +30,28 @@ export default [
                 path: "travel-plan",
                 children: [
                     {
-                        index: true,
-                        element: <TravelPlan />,
+                        path: "",
+                        element: <Authorize roles={["HR"]} />,
+                        children: [
+                            {
+                                index: true,
+                                element: <TravelPlan />,
+                            },
+                        ]
+                    },
+                    {
+                        path: "me",
+                        element: <TravelPlan isMy={true} />,
                     },
                     {
                         path: "add",
-                        element: <AddTravelPlan />,
+                        element: <Authorize roles={["HR"]} />,
+                        children: [
+                            {
+                                index: true,
+                                element: <AddTravelPlan />
+                            },
+                        ]
                     },
                     {
                         path: ":travelPlanId",
@@ -60,7 +77,7 @@ export default [
             },
             {
                 path: "employee",
-                children:[
+                children: [
                     {
                         index: true,
                         element: <Employee />
@@ -73,19 +90,25 @@ export default [
             },
             {
                 path: "job-openings",
-                children:[
+                children: [
                     {
                         index: true,
                         element: <JobOpenings />
                     },
                     {
                         path: "add",
-                        element: <AddJobOpening />
+                        element: <Authorize roles={["HR"]} />,
+                        children: [
+                            {
+                                index: true,
+                                element: <AddJobOpening />
+                            },
+                        ]
                     },
                     {
                         path: ":jobId",
                         element: <SingleJobOpening />,
-                        children:[
+                        children: [
                             {
                                 path: "share",
                                 element: <ShareJob />
@@ -100,7 +123,8 @@ export default [
             },
             {
                 path: "configuration",
-                children:[
+                element: <Authorize roles={["HR"]} />,
+                children: [
                     {
                         index: true,
                         element: <Configuration />
