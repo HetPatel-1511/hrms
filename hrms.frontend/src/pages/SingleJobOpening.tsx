@@ -76,7 +76,7 @@ const SingleJobOpening = () => {
                                     </div>
                                 </Card>
                             )}
-                            <Card className="p-6">
+                            {jobOpening.isActive && <Card className="p-6">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Actions</h2>
                                 <div className="flex space-x-4">
                                     <Button onClick={handleShare} className="flex items-center space-x-2">
@@ -86,7 +86,7 @@ const SingleJobOpening = () => {
                                         <span>Refer Friend</span>
                                     </Button>
                                 </div>
-                            </Card>
+                            </Card>}
                         </div>
 
                         <div className="space-y-6">
