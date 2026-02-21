@@ -6,7 +6,9 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "employees")
@@ -67,6 +69,13 @@ public class Employee {
 
     @OneToMany(mappedBy = "employee")
     private List<EmployeeRole> employeeRoles;
+
+    @ManyToMany
+    @JoinTable(name = "employee_game_interest",
+            joinColumns = @JoinColumn(name = "fk_employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "fk_games_id")
+    )
+    private Set<Game> gamesInterestedIn = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -174,5 +183,21 @@ public class Employee {
 
     public void setEmployeeRoles(List<EmployeeRole> employeeRoles) {
         this.employeeRoles = employeeRoles;
+    }
+
+    public Set<Game> getGamesInterestedIn() {
+        return gamesInterestedIn;
+    }
+
+    public void setGamesInterestedIn(Set<Game> gamesInterestedIn) {
+        this.gamesInterestedIn = gamesInterestedIn;
+    }
+
+    public void addGameInterestedIn(Game game) {
+        this.gamesInterestedIn.add(game);
+    }
+
+    public void removeGameInterestedIn(Game game) {
+        this.gamesInterestedIn.remove(game);
     }
 }

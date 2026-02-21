@@ -251,4 +251,15 @@ public class EntityMapper {
         }
         return dto;
     }
+
+    public GameResponseDTO toGameResponseDTO(Game game) {
+        if (game == null) return null;
+        GameResponseDTO dto = modelMapper.map(game, GameResponseDTO.class);
+        return dto;
+    }
+
+    public List<GameResponseDTO> toGameResponseDTOList(List<Game> games) {
+        if (games == null) return Collections.emptyList();
+        return games.stream().map(this::toGameResponseDTO).toList();
+    }
 }
