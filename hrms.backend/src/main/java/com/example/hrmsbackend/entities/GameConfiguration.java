@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -24,8 +23,8 @@ public class GameConfiguration {
     private Game game;
 
     @NotNull
-    @Column(name = "duration_before_slot_opens", nullable = false)
-    private Duration durationBeforeSlotOpens;
+    @Column(name = "slot_release_time", nullable = false)
+    private LocalTime slotReleaseTime;
 
     @NotNull
     @Column(name = "slot_duration_minutes", nullable = false)
@@ -115,11 +114,11 @@ public class GameConfiguration {
         this.updatedAt = updatedAt;
     }
 
-    public Duration getDurationBeforeSlotOpens() {
-        return durationBeforeSlotOpens;
+    public LocalTime getSlotReleaseTime() {
+        return slotReleaseTime;
     }
 
-    public void setDurationBeforeSlotOpens(Duration durationBeforeSlotOpens) {
-        this.durationBeforeSlotOpens = durationBeforeSlotOpens;
+    public void setSlotReleaseTime(LocalTime slotReleaseTime) {
+        this.slotReleaseTime = slotReleaseTime;
     }
 }

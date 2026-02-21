@@ -2,13 +2,12 @@ package com.example.hrmsbackend.dtos.response;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class GameConfigResponseDTO {
     private Long id;
-    private Duration durationBeforeSlotOpens;
+    private LocalTime slotReleaseTime;
     private Integer slotDurationMinutes;
     private Integer maxPlayersPerSlot;
     private LocalTime operatingStartTime;
@@ -64,12 +63,12 @@ public class GameConfigResponseDTO {
         this.slotDurationMinutes = slotDurationMinutes;
     }
 
-    public Duration getDurationBeforeSlotOpens() {
-        return durationBeforeSlotOpens;
+    public LocalTime getSlotReleaseTime() {
+        return slotReleaseTime;
     }
 
-    public void setDurationBeforeSlotOpens(Duration durationBeforeSlotOpens) {
-        this.durationBeforeSlotOpens = durationBeforeSlotOpens;
+    public void setSlotReleaseTime(LocalTime slotReleaseTime) {
+        this.slotReleaseTime = slotReleaseTime;
     }
 
     public Long getId() {

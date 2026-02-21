@@ -125,7 +125,7 @@ public class GameService {
 
         GameConfiguration gameConfiguration = new GameConfiguration();
         gameConfiguration.setGame(savedGame);
-        gameConfiguration.setDurationBeforeSlotOpens(dto.getDurationBeforeSlotOpens());
+        gameConfiguration.setSlotReleaseTime(dto.getSlotReleaseTime());
         gameConfiguration.setOperatingStartTime(dto.getOperatingStartTime());
         gameConfiguration.setOperatingEndTime(dto.getOperatingEndTime());
         gameConfiguration.setMaxPlayersPerSlot(dto.getMaxPlayersPerSlot());

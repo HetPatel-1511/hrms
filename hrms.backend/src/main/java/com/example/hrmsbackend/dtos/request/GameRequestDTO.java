@@ -2,15 +2,14 @@ package com.example.hrmsbackend.dtos.request;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.time.Duration;
 import java.time.LocalTime;
 
 public class GameRequestDTO {
     @NotNull(message = "Name is required")
     private String name;
 
-    @NotNull(message = "Duration before slot opens is required")
-    private Duration durationBeforeSlotOpens;
+    @NotNull(message = "Slot release time is required")
+    private LocalTime slotReleaseTime;
 
     @NotNull(message = "Slot duration minutes is required")
     private Integer slotDurationMinutes;
@@ -32,12 +31,12 @@ public class GameRequestDTO {
         this.name = name;
     }
 
-    public Duration getDurationBeforeSlotOpens() {
-        return durationBeforeSlotOpens;
+    public LocalTime getSlotReleaseTime() {
+        return slotReleaseTime;
     }
 
-    public void setDurationBeforeSlotOpens(Duration durationBeforeSlotOpens) {
-        this.durationBeforeSlotOpens = durationBeforeSlotOpens;
+    public void setSlotReleaseTime(LocalTime slotReleaseTime) {
+        this.slotReleaseTime = slotReleaseTime;
     }
 
     public Integer getSlotDurationMinutes() {
