@@ -44,4 +44,14 @@ public class GameController {
     public ResponseEntity<ApiResponse<String>> interested(@PathVariable Long gameId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(ResponseUtil.success(gameService.interested(gameId, userDetails), "Interest updated successfully", 201));
     }
+
+    @PostMapping("/slots/{slotId}/allocate")
+    public ResponseEntity<ApiResponse<String>> allocateSlot(@PathVariable Long slotId) {
+        return ResponseEntity.ok(ResponseUtil.success(gameService.allocateSlot(slotId), "Slot allocated successfully", 200));
+    }
+
+    @PostMapping("/bookings/{bookingId}/cancel")
+    public ResponseEntity<ApiResponse<String>> cancelBooking(@PathVariable Long bookingId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ResponseUtil.success(gameService.cancelBooking(bookingId, userDetails), "Booking cancelled successfully", 200));
+    }
 }
