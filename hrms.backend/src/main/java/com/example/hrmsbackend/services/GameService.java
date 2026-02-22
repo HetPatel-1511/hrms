@@ -3,7 +3,10 @@ package com.example.hrmsbackend.services;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.GameBookingRequestDTO;
 import com.example.hrmsbackend.dtos.request.GameRequestDTO;
+import com.example.hrmsbackend.dtos.request.GameConfigUpdateDTO;
 import com.example.hrmsbackend.dtos.response.GameResponseDTO;
+import com.example.hrmsbackend.dtos.response.EmployeeSummaryDTO;
+import com.example.hrmsbackend.dtos.response.GameConfigResponseDTO;
 import com.example.hrmsbackend.entities.*;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
@@ -17,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class GameService {
@@ -57,6 +61,12 @@ public class GameService {
         return entityMapper.toGameResponseDTOList(games);
     }
 
+    public GameResponseDTO getGameById(Long gameId) {
+        Game game = gameRepo.findById(gameId)
+                .orElseThrow(() -> new ResourceNotFoundException("Game with ID: " + gameId + " doesn't exist"));
+        return entityMapper.toGameResponseDTO(game);
+    }
+
     @Transactional
     public String book(GameBookingRequestDTO dto, CustomUserDetails userDetails) {
         GameSlot gameSlot = gameSlotRepo.findById(dto.getGameSlotId()).orElseThrow(()->new ResourceNotFoundException("Invalid booking slot"));
@@ -92,6 +102,12 @@ public class GameService {
         } else {
             return "Added to waiting list for " + gameSlot.getGame().getName() + " on " + gameSlot.getSlotDate() + " from " + gameSlot.getStartTime() + " to " + gameSlot.getEndTime();
         }
+    }
+
+    public List<EmployeeSummaryDTO> getInterestedUsers(Long gameId) {
+        Game game = gameRepo.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("Game with ID: " + gameId + " doesn't exist"));
+        Set<Employee> interestedEmployees = game.getInterestedEmployees();
+        return entityMapper.toEmployeeSummaryDTOList(interestedEmployees.stream().toList());
     }
 
     @Transactional
@@ -267,6 +283,28 @@ public class GameService {
         GameConfiguration savedGameConfiguration = gameConfigurationRepo.save(gameConfiguration);
         GameResult result = new GameResult(game, savedGameConfiguration);
         return result;
+    }
+
+    @Transactional
+    public String updateGameConfiguration(Long gameId, GameConfigUpdateDTO dto) {
+        Game game = gameRepo.findById(gameId)
+                .orElseThrow(() -> new ResourceNotFoundException("Game with ID: " + gameId + " doesn't exist"));
+        
+        GameConfiguration gameConfiguration = gameConfigurationRepo.findByGameId(gameId)
+                .orElseThrow(() -> new ResourceNotFoundException("Game configuration not found for game ID: " + gameId));
+        
+        gameConfiguration.setSlotReleaseTime(dto.getSlotReleaseTime());
+        gameConfiguration.setSlotDurationMinutes(dto.getSlotDurationMinutes());
+        gameConfiguration.setMaxPlayersPerSlot(dto.getMaxPlayersPerSlot());
+        gameConfiguration.setOperatingStartTime(dto.getOperatingStartTime());
+        gameConfiguration.setOperatingEndTime(dto.getOperatingEndTime());
+        
+        game.setActive(dto.getActive());
+        
+        gameConfigurationRepo.save(gameConfiguration);
+        gameRepo.save(game);
+        
+        return "Game configuration updated successfully";
     }
 
     private record GameResult(Game game, GameConfiguration savedGameConfiguration) {

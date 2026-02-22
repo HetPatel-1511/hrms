@@ -18,6 +18,9 @@ import AddJobOpening from "../pages/AddJobOpening";
 import SingleJobOpening from "../pages/SingleJobOpening";
 import ShareJob from "../pages/ShareJob";
 import ReferFriend from "../pages/ReferFriend";
+import Games from "../pages/Games";
+import AddGames from "../pages/AddGames";
+import EditGames from "../pages/EditGames";
 import NotFound404 from "../pages/NotFound404";
 import Authorize from "../components/Authorize";
 
@@ -119,6 +122,35 @@ export default [
                             },
                         ]
                     },
+                ]
+            },
+            {
+                path: "games",
+                children: [
+                    {
+                        index: true,
+                        element: <Games />
+                    },
+                    {
+                        path: "add",
+                        element: <Authorize roles={["HR"]} />,
+                        children: [
+                            {
+                                index: true,
+                                element: <AddGames />
+                            },
+                        ]
+                    },
+                    {
+                        path: ":gameId/edit",
+                        element: <Authorize roles={["HR"]} />,
+                        children: [
+                            {
+                                index: true,
+                                element: <EditGames />
+                            },
+                        ]
+                    }
                 ]
             },
             {

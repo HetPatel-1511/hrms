@@ -9,4 +9,5 @@ export const QUERY_KEY = {
     SINGLE_CONFIGURATION: "singleConfiguration",
     SINGLE_EMPLOYEES: "singleEmployee",
     JOB_OPENINGS: "jobOpenings",
+    GAMES: "games",
 }

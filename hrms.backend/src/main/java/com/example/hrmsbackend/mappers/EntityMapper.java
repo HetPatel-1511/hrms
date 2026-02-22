@@ -262,4 +262,9 @@ public class EntityMapper {
         if (games == null) return Collections.emptyList();
         return games.stream().map(this::toGameResponseDTO).toList();
     }
+
+    public GameConfigResponseDTO toGameConfigResponseDTO(GameConfiguration gameConfiguration) {
+        if (gameConfiguration == null) return null;
+        return modelMapper.map(gameConfiguration, GameConfigResponseDTO.class);
+    }
 }
