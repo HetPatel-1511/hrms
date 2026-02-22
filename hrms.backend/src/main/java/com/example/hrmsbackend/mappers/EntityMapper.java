@@ -281,4 +281,84 @@ public class EntityMapper {
         if (gameSlots == null) return Collections.emptyList();
         return gameSlots.stream().map(this::toGameSlotResponseDTO).toList();
     }
+
+    // Achievements / Posts mappings
+    public TagDTO toTagDTO(Tag tag) {
+        if (tag == null) return null;
+        return modelMapper.map(tag, TagDTO.class);
+    }
+
+    public List<TagDTO> toTagDTOList(List<Tag> tags) {
+        if (tags == null) return Collections.emptyList();
+        return tags.stream().map(this::toTagDTO).toList();
+    }
+
+    public CommentDTO toCommentDTO(Comment comment) {
+        if (comment == null) return null;
+        CommentDTO dto = modelMapper.map(comment, CommentDTO.class);
+        if (comment.getEmployee() != null) {
+            dto.setEmployee(toEmployeeSummaryDTO(comment.getEmployee()));
+        }
+        if (comment.getReplies() != null) {
+            dto.setReplies(comment.getReplies().stream().map(this::toCommentDTO).toList());
+        }
+        return dto;
+    }
+
+    public List<CommentDTO> toCommentDTOList(List<Comment> comments) {
+        if (comments == null) return Collections.emptyList();
+        return comments.stream().map(this::toCommentDTO).toList();
+    }
+
+    public LikeDTO toLikeDTO(Like like) {
+        if (like == null) return null;
+        LikeDTO dto = modelMapper.map(like, LikeDTO.class);
+        if (like.getEmployee() != null) dto.setEmployee(toEmployeeSummaryDTO(like.getEmployee()));
+        if (like.getPost() != null) dto.setPostId(like.getPost().getId());
+        if (like.getComment() != null) dto.setCommentId(like.getComment().getId());
+        return dto;
+    }
+
+    public List<LikeDTO> toLikeDTOList(List<Like> likes) {
+        if (likes == null) return Collections.emptyList();
+        return likes.stream().map(this::toLikeDTO).toList();
+    }
+
+    public PostDTO toPostDTO(Post post) {
+        if (post == null) return null;
+        PostDTO dto = modelMapper.map(post, PostDTO.class);
+        if (post.getAuthor() != null) dto.setAuthor(toEmployeeSummaryDTO(post.getAuthor()));
+        if (post.getPostTags() != null) {
+            dto.setTags(post.getPostTags().stream().map(pt -> toTagDTO(pt.getTag())).toList());
+        }
+        if (post.getMedia() != null) {
+            dto.setMedia(toMediaResponseDTO(post.getMedia()));
+        }
+        dto.setLikeCount(post.getLikes() != null ? post.getLikes().size() : 0);
+        dto.setCommentCount(post.getComments() != null ? post.getComments().size() : 0);
+        return dto;
+    }
+
+    public List<PostDTO> toPostDTOList(List<Post> posts) {
+        if (posts == null) return Collections.emptyList();
+        return posts.stream().map(this::toPostDTO).toList();
+    }
+
+    public PostDetailDTO toPostDetailDTO(Post post) {
+        if (post == null) return null;
+        PostDetailDTO dto = modelMapper.map(post, PostDetailDTO.class);
+        if (post.getAuthor() != null) {
+            dto.setAuthor(toEmployeeSummaryDTO(post.getAuthor()));
+        }
+        if (post.getPostTags() != null) {
+            dto.setTags(post.getPostTags().stream().map(pt -> toTagDTO(pt.getTag())).toList());
+        }
+        if (post.getMedia() != null) {
+            dto.setMedia(toMediaResponseDTO(post.getMedia()));
+        }
+        dto.setLikeCount(post.getLikes() != null ? post.getLikes().size() : 0);
+        dto.setCommentCount(post.getComments() != null ? post.getComments().size() : 0);
+        dto.setComments(toCommentDTOList(post.getComments()));
+        return dto;
+    }
 }
