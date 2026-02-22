@@ -4,10 +4,7 @@ import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.GameBookingRequestDTO;
 import com.example.hrmsbackend.dtos.request.GameRequestDTO;
 import com.example.hrmsbackend.dtos.request.GameConfigUpdateDTO;
-import com.example.hrmsbackend.dtos.response.ApiResponse;
-import com.example.hrmsbackend.dtos.response.GameResponseDTO;
-import com.example.hrmsbackend.dtos.response.GameConfigResponseDTO;
-import com.example.hrmsbackend.dtos.response.EmployeeSummaryDTO;
+import com.example.hrmsbackend.dtos.response.*;
 import com.example.hrmsbackend.entities.Employee;
 import com.example.hrmsbackend.services.GameService;
 import com.example.hrmsbackend.utils.ResponseUtil;
@@ -53,6 +50,21 @@ public class GameController {
     @GetMapping("/{gameId}/interested")
     public ResponseEntity<ApiResponse<List<EmployeeSummaryDTO>>> getInterestedUsers(@PathVariable Long gameId) {
         return ResponseEntity.ok(ResponseUtil.success(gameService.getInterestedUsers(gameId), "Interested users fetched successfully", 200));
+    }
+
+    @GetMapping("/users/{userId}/interested")
+    public ResponseEntity<ApiResponse<List<GameResponseDTO>>> getUserInterestedGames(@PathVariable Long userId) {
+        return ResponseEntity.ok(ResponseUtil.success(gameService.getUserInterestedGames(userId), "User interested games fetched successfully", 200));
+    }
+
+    @GetMapping("/{gameId}/upcoming-slots")
+    public ResponseEntity<ApiResponse<List<GameSlotGroupedResponseDTO>>> getUpcomingSlots(@PathVariable Long gameId) {
+        return ResponseEntity.ok(ResponseUtil.success(gameService.getUpcomingSlotsForGame(gameId), "Upcoming slots fetched successfully", 200));
+    }
+
+    @GetMapping("/employees/{employeeId}/booking")
+    public ResponseEntity<ApiResponse<List<GameBookingResponseDTO>>> getBookings(@PathVariable Long employeeId) {
+        return ResponseEntity.ok(ResponseUtil.success(gameService.getBookings(employeeId), "Game bookings fetched successfully", 200));
     }
 
     @PostMapping("/{gameId}/interested")

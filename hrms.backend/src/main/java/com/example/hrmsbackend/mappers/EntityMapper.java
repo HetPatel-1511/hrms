@@ -183,6 +183,10 @@ public class EntityMapper {
             dto.setDirectReports(toEmployeeSummaryDTOList(employee.getSubordinates()));
         }
 
+        if (employee.getEmployeeRoles()!=null){
+            dto.setRoles(employee.getEmployeeRoles().stream().map(this::mapRole).toList());
+        }
+
         return dto;
     }
 
@@ -266,5 +270,15 @@ public class EntityMapper {
     public GameConfigResponseDTO toGameConfigResponseDTO(GameConfiguration gameConfiguration) {
         if (gameConfiguration == null) return null;
         return modelMapper.map(gameConfiguration, GameConfigResponseDTO.class);
+    }
+
+    public GameSlotResponseDTO toGameSlotResponseDTO(GameSlot gameSlot) {
+        if (gameSlot == null) return null;
+        return modelMapper.map(gameSlot, GameSlotResponseDTO.class);
+    }
+
+    public List<GameSlotResponseDTO> toGameSlotResponseDTOList(List<GameSlot> gameSlots) {
+        if (gameSlots == null) return Collections.emptyList();
+        return gameSlots.stream().map(this::toGameSlotResponseDTO).toList();
     }
 }

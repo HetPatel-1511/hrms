@@ -15,12 +15,15 @@ import java.util.List;
 @Repository
 public interface GameBookingRepo extends JpaRepository<GameBooking, Long> {
 
-    @Query("SELECT COUNT(gb) FROM GameBooking gb WHERE gb.bookedBy = :employee AND gb.bookingStatus IN ('CONFIRMED', 'COMPLETED') AND gb.gameSlot.slotDate BETWEEN :startDate AND :endDate")
-    Long countEmployeeBookingsInCycle(@Param("employee") Employee employee, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query("SELECT COUNT(gb) FROM GameBooking gb WHERE gb.gameSlot.game.id = :gameId AND gb.bookedBy = :employee AND gb.bookingStatus IN ('CONFIRMED', 'COMPLETED') AND gb.gameSlot.slotDate BETWEEN :startDate AND :endDate")
+    Long countEmployeeBookingsInCycle(@Param("employee") Employee employee, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("gameId") Long gameId);
 
     @Query("SELECT gb FROM GameBooking gb WHERE gb.gameSlot.id = :slotId AND gb.bookingStatus = 'WAITING' ORDER BY gb.createdAt ASC")
     List<GameBooking> findWaitingBookingsForSlot(@Param("slotId") Long slotId);
 
-    @Query("SELECT gb FROM GameBooking gb WHERE gb.bookedBy = :employee AND gb.gameSlot.slotDate = :date AND gb.bookingStatus IN ('WAITING', 'CONFIRMED')")
-    List<GameBooking> findEmployeeBookingsForDate(@Param("employee") Employee employee, @Param("date") LocalDate date);
+    @Query("SELECT gb FROM GameBooking gb WHERE gb.gameSlot.game.id = :gameId AND gb.bookedBy = :employee AND gb.gameSlot.slotDate = :date AND gb.bookingStatus IN ('WAITING', 'CONFIRMED')")
+    List<GameBooking> findEmployeeBookingsForDate(@Param("employee") Employee employee, @Param("date") LocalDate date, @Param("gameId") Long gameId);
+
+    @Query("SELECT gb FROM GameBooking gb WHERE gb.bookedBy = :employee OR gb.id IN (SELECT egb.gameBooking.id FROM EmployeeGameBooking egb WHERE egb.employee = :employee)")
+    List<GameBooking> findEmployeeGameBookings(@Param("employee") Employee employee);
 }

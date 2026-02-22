@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import SidebarListButton from './SidebarListButton'
-import { AdjustmentsHorizontalIcon, ArrowRightEndOnRectangleIcon, BriefcaseIcon, CameraIcon, HomeIcon, UserCircleIcon, TrophyIcon } from '@heroicons/react/24/solid'
-import { href } from 'react-router'
+import { AdjustmentsHorizontalIcon, ArrowRightEndOnRectangleIcon, BriefcaseIcon, CameraIcon, HomeIcon, UserCircleIcon, TrophyIcon, UserIcon } from '@heroicons/react/24/solid'
+import { Link, useLocation } from 'react-router'
 import { useAuthorization } from '../hooks/useAuthorization'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/slices/userSlice'
 
 const Sidebar = React.memo(() => {
     const {hasRole} = useAuthorization();
+    const user = useSelector(selectUser);
     const sidebarList = [
         {
             title: "Home",
@@ -38,6 +41,20 @@ const Sidebar = React.memo(() => {
             title: "Employees",
             isDropdown: false,
             href: "/employee",
+            Icon: <UserCircleIcon className='h-6 w-6' />,
+            show: true
+        },
+        {
+            title: "My Bookings",
+            isDropdown: false,
+            href: `/games/employee/${user?.id}/bookings`,
+            Icon: <TrophyIcon className='h-6 w-6' />,
+            show: true
+        },
+        {
+            title: "My Profile",
+            isDropdown: false,
+            href: `/employee/${user?.id}/profile`,
             Icon: <UserCircleIcon className='h-6 w-6' />,
             show: true
         },

@@ -25,6 +25,8 @@ public class EmployeeDetailsResponseDTO {
 
     private List<EmployeeSummaryDTO> directReports;
 
+    private List<RoleResponseDTO> roles;
+
     public Long getId() {
         return id;
     }
@@ -87,5 +89,13 @@ public class EmployeeDetailsResponseDTO {
 
     public void setManager(EmployeeManagerDetailsResponseDTO manager) {
         this.manager = manager;
+    }
+
+    public List<RoleResponseDTO> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleResponseDTO> roles) {
+        this.roles = roles;
     }
 }

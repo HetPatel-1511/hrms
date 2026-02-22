@@ -10,6 +10,7 @@ import TravelPlanEmployeeExpenses from "../pages/TravelPlanEmployeeExpenses";
 import AddTravelPlanEmployeeExpenses from "../pages/AddTravelPlanEmployeeExpenses";
 import Employee from "../pages/Employee";
 import SingleEmployee from "../pages/SingleEmployee";
+import UserProfile from "../pages/UserProfile";
 import Configuration from "../pages/Configuration";
 import AddConfiguration from "../pages/AddConfiguration";
 import EditConfiguration from "../pages/EditConfiguration";
@@ -21,6 +22,8 @@ import ReferFriend from "../pages/ReferFriend";
 import Games from "../pages/Games";
 import AddGames from "../pages/AddGames";
 import EditGames from "../pages/EditGames";
+import SingleGame from "../pages/SingleGame";
+import GameBookings from "../pages/GameBookings";
 import NotFound404 from "../pages/NotFound404";
 import Authorize from "../components/Authorize";
 
@@ -89,6 +92,10 @@ export default [
                         path: ":employeeId",
                         element: <SingleEmployee />
                     },
+                    {
+                        path: ":id/profile",
+                        element: <UserProfile />
+                    }
                 ]
             },
             {
@@ -132,6 +139,10 @@ export default [
                         element: <Games />
                     },
                     {
+                        path: ":gameId",
+                        element: <SingleGame />
+                    },
+                    {
                         path: "add",
                         element: <Authorize roles={["HR"]} />,
                         children: [
@@ -150,6 +161,10 @@ export default [
                                 element: <EditGames />
                             },
                         ]
+                    },
+                    {
+                        path: "employee/:employeeId/bookings",
+                        element: <GameBookings />
                     }
                 ]
             },
