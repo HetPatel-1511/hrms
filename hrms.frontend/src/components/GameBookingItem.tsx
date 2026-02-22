@@ -3,6 +3,7 @@ import UserAvatar from './UserAvatar'
 import Button from './Button'
 import useCancelBookingMutation from '../query/queryHooks/useCancelBookingMutation'
 import { useAuthorization } from '../hooks/useAuthorization'
+import { toast } from 'react-toastify'
 
 const GameBookingItem = ({ booking }: any) => {
     const cancelBooking = useCancelBookingMutation()
@@ -31,7 +32,11 @@ const GameBookingItem = ({ booking }: any) => {
 
     const handleCancelBooking = (bookingId: number) => {
         if (window.confirm('Are you sure you want to cancel this booking?')) {
-            cancelBooking.mutate(bookingId)
+            cancelBooking.mutate(bookingId, {
+                onSuccess: (response) => {
+                    toast.success(response.data || 'Booking cancelled successfully!')
+                }
+            })
         }
     }
 

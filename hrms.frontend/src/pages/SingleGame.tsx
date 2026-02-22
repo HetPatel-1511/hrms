@@ -10,10 +10,14 @@ import Card from '../components/Card'
 import Button from '../components/Button'
 import UpcomingSlots from '../components/UpcomingSlots'
 import InterestedUsers from '../components/InterestedUsers'
+import { useSelector } from 'react-redux'
+import { selectUser } from '../redux/slices/userSlice'
+import { toast } from 'react-toastify'
 
 const SingleGame = () => {
     const { gameId } = useParams()
     const navigate = useNavigate()
+    const currentUser = useSelector(selectUser)
     
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
     const [selectedUsers, setSelectedUsers] = useState<string[]>([])
@@ -48,17 +52,18 @@ const SingleGame = () => {
     }
 
     const handleBookSlot = () => {
-        if (!selectedSlot || selectedUsers.length === 0) {
-            alert('Please select a slot and at least one user')
-            return
+        if (selectedSlot && selectedUsers.length > 0) {
+            const bookingData = {
+                gameSlotId: parseInt(selectedSlot),
+                employeeIds: selectedUsers.map(id => parseInt(id))
+            }
+            bookGameSlot.mutate(bookingData, {
+                onSuccess: (response) => {
+                    toast.success(response.data || 'Booking created successfully!')
+                    navigate(`/games/employee/${currentUser?.id}/bookings`)
+                }
+            })
         }
-
-        const bookingData = {
-            gameSlotId: parseInt(selectedSlot),
-            employeeIds: selectedUsers.map(id => parseInt(id))
-        }
-
-        bookGameSlot.mutate(bookingData)
     }
 
     const formatTime = (time: string) => {
