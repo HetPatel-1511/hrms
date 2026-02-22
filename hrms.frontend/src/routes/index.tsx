@@ -5,9 +5,13 @@ import Login from "../pages/Login";
 import TravelPlan from "../pages/TravelPlan";
 import AddTravelPlan from "../pages/AddTravelPlan";
 import SingleTravelPlan from "../pages/SingleTravelPlan";
+import Posts from "../pages/Posts";
 import TravelPlanEmployeeDocuments from "../pages/TravelPlanEmployeeDocuments";
 import TravelPlanEmployeeExpenses from "../pages/TravelPlanEmployeeExpenses";
 import AddTravelPlanEmployeeExpenses from "../pages/AddTravelPlanEmployeeExpenses";
+import AddPost from "../pages/AddPost";
+import EditPost from "../pages/EditPost";
+import PostDetail from "../pages/PostDetail";
 import Employee from "../pages/Employee";
 import SingleEmployee from "../pages/SingleEmployee";
 import UserProfile from "../pages/UserProfile";
@@ -81,6 +85,27 @@ export default [
                     },
                 ]
             },
+                {
+                    path: "post",
+                    children: [
+                        {
+                            index: true,
+                            element: <Posts />
+                        },
+                        {
+                            path: "add",
+                            element: <AddPost />
+                        },
+                        {
+                            path: ":postId",
+                            element: <PostDetail />
+                        },
+                        {
+                            path: ":postId/edit",
+                            element: <EditPost />
+                        }
+                    ]
+                },
             {
                 path: "employee",
                 children: [

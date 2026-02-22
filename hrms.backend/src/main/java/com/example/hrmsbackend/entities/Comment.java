@@ -22,9 +22,8 @@ public class Comment {
     @Column(name = "text", nullable = false)
     private String text;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_post_id", nullable = false)
+    @JoinColumn(name = "fk_post_id", nullable = true)
     private Post post;
 
     @NotNull

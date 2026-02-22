@@ -31,6 +31,13 @@ const Sidebar = React.memo(() => {
             ]
         },
         {
+            title: "Posts",
+            isDropdown: false,
+            Icon: <BriefcaseIcon className='h-6 w-6' />,
+            href: "/post",
+            show: true
+        },
+        {
             title: "My Travel Plan",
             isDropdown: false,
             Icon: <CameraIcon className='h-6 w-6' />,

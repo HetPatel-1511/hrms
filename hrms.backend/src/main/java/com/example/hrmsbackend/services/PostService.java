@@ -225,6 +225,7 @@ public class PostService {
             Comment parent = commentRepo.findById(request.getParentCommentId()).orElse(null);
             if (parent == null) throw new ResourceNotFoundException("Parent comment not found");
             comment.setParentComment(parent);
+            comment.setPost(null);
         }
 
         commentRepo.save(comment);
