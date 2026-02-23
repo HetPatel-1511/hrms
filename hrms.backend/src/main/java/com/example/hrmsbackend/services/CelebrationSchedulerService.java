@@ -26,9 +26,9 @@ public class CelebrationSchedulerService {
         this.postRepo = postRepo;
     }
 
+    // @Scheduled(cron = "0 * 17 * * ?")
     // Run every day at 00:00
-//    @Scheduled(cron = "0 0 0 * * ?")
-    @Scheduled(cron = "0 * 17 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public void createDailyCelebrationPosts() {
         System.out.println("createDailyCelebrationPosts-=-=-==-");
