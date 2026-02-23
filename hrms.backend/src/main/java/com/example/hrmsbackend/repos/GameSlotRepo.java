@@ -2,12 +2,14 @@ package com.example.hrmsbackend.repos;
 
 import com.example.hrmsbackend.entities.Game;
 import com.example.hrmsbackend.entities.GameSlot;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -18,4 +20,7 @@ public interface GameSlotRepo extends JpaRepository<GameSlot, Long> {
     
     @Query("SELECT gs FROM GameSlot gs WHERE gs.game.id = :gameId AND gs.slotDate >= :currentDate AND gs.slotStatus IN ('AVAILABLE') ORDER BY gs.slotDate ASC, gs.startTime ASC")
     List<GameSlot> findUpcomingSlotsByGameId(@Param("gameId") Long gameId, @Param("currentDate") LocalDate currentDate);
+
+    @Query("SELECT gs FROM GameSlot gs WHERE gs.slotDate = :date AND gs.slotStatus IN ('AVAILABLE')")
+    List<GameSlot> findUpcomingSlots(@Param("date") LocalDate date);
 }

@@ -13,6 +13,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -293,7 +294,7 @@ public class GameService {
         return gameBookingRepo.countEmployeeBookingsInCycle(employee, cycleStartDate, today, game.getId());
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String allocateSlot(Long slotId) {
         GameSlot gameSlot = gameSlotRepo.findById(slotId).orElseThrow(()->new ResourceNotFoundException("Invalid Slot Id"));
         
@@ -314,7 +315,11 @@ public class GameService {
         gameBookingRepo.save(selectedBooking);
         gameSlotRepo.save(gameSlot);
 
-        return "Slot allocated to " + selectedBooking.getBookedBy().getName() + " for " + gameSlot.getGame().getName() + " on " + gameSlot.getSlotDate();
+        // ensure changes are flushed to the database so scheduled threads observe them
+        gameBookingRepo.flush();
+        gameSlotRepo.flush();
+
+        return "Slot allocated to " + selectedBooking.getBookedBy().getName() + " for " + gameSlot.getGame().getName() + " on " + gameSlot.getSlotDate() + " from " + gameSlot.getStartTime() + " to " + gameSlot.getEndTime();
     }
 
     private GameBooking findFairBooking(List<GameBooking> waitingBookings, LocalDate date, Game game) {

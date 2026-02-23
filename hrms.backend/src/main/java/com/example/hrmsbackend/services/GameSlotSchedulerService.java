@@ -21,12 +21,14 @@ public class GameSlotSchedulerService {
     private final GameRepo gameRepo;
     private final GameConfigurationRepo gameConfigurationRepo;
     private final GameSlotRepo gameSlotRepo;
+    private final GameService gameService;
 
     @Autowired
-    public GameSlotSchedulerService(GameRepo gameRepo, GameConfigurationRepo gameConfigurationRepo, GameSlotRepo gameSlotRepo) {
+    public GameSlotSchedulerService(GameRepo gameRepo, GameConfigurationRepo gameConfigurationRepo, GameSlotRepo gameSlotRepo, GameService gameService) {
         this.gameRepo = gameRepo;
         this.gameConfigurationRepo = gameConfigurationRepo;
         this.gameSlotRepo = gameSlotRepo;
+        this.gameService = gameService;
     }
 
     @Transactional
@@ -107,6 +109,36 @@ public class GameSlotSchedulerService {
             if (currentTime.equals(releaseTime) || currentTime.isAfter(releaseTime)) {
                 System.out.println("Triggering slot generation for game: " + config.getGame().getName() + " at release time: " + releaseTime);
                 generateSlotsForGame(config.getGame(), tomorrow);
+            }
+        }
+    }
+
+    @Scheduled(fixedDelay = 300000) // checks every 5 minutes
+    @Transactional
+    public void allocateSlotsBefore30Minutes() {
+        System.out.println("Checking for slot allocation 30 minutes before start time");
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+        List<GameSlot> upcomingSlots = gameSlotRepo.findUpcomingSlots(today);
+
+        upcomingSlots = upcomingSlots.stream()
+                .filter(slot -> "AVAILABLE".equals(slot.getSlotStatus()) &&
+                        slot.getStartTime().isAfter(currentTime) &&
+                        slot.getStartTime().isBefore(currentTime.plus(30, ChronoUnit.MINUTES)))
+                .toList();
+
+        for (GameSlot slot : upcomingSlots) {
+            System.out.println("slot.getSlotStatus()");
+            System.out.println(slot.getSlotStatus());
+            if ("AVAILABLE".equals(slot.getSlotStatus())) {
+                try {
+                    System.out.println("Attempting to allocate slot for game: " + slot.getGame().getName() + " starting at: " + slot.getStartTime());
+                    String result = gameService.allocateSlot(slot.getId());
+                    System.out.println("Allocation result: " + result);
+                } catch (Exception e) {
+                    System.out.println("Error allocating slot for game: " + slot.getGame().getName() + " - " + e.getMessage());
+                }
             }
         }
     }
