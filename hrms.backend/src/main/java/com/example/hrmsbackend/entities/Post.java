@@ -47,6 +47,10 @@ public class Post {
     @JoinColumn(name = "fk_media_id")
     private Media media;
 
+    @NotNull
+    @Column(name = "is_system_generated", nullable = false)
+    private Boolean isSystemGenerated = false;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PostTag> postTags;
 
@@ -138,5 +142,13 @@ public class Post {
 
     public void setLikes(List<Like> likes) {
         this.likes = likes;
+    }
+
+    public Boolean getSystemGenerated() {
+        return isSystemGenerated;
+    }
+
+    public void setSystemGenerated(Boolean systemGenerated) {
+        isSystemGenerated = systemGenerated;
     }
 }

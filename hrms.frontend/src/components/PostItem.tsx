@@ -8,13 +8,17 @@ import { useAuthorization } from '../hooks/useAuthorization'
 import { PencilIcon } from '@heroicons/react/24/outline'
 import { HandThumbUpIcon as ThumbUpOutline } from '@heroicons/react/24/outline'
 import { HandThumbUpIcon as ThumbUpSolid } from '@heroicons/react/24/solid'
+import { TrashIcon } from '@heroicons/react/24/outline'
 import useLikePostMutation from '../query/queryHooks/useLikePostMutation'
 import useUnlikePostMutation from '../query/queryHooks/useUnlikePostMutation'
+import useDeletePostMutation from '../query/queryHooks/useDeletePostMutation'
+import { toast } from 'react-toastify'
 
 const PostItem = ({ post }: any) => {
     const { isOwner } = useAuthorization()
     const likePost = useLikePostMutation()
     const unlikePost = useUnlikePostMutation()
+    const deletePost = useDeletePostMutation()
 
     const handleLikeToggle = (e: any) => {
         e.stopPropagation()
@@ -26,6 +30,17 @@ const PostItem = ({ post }: any) => {
         }
     }
 
+    const handleDelete = (e: any) => {
+        e.stopPropagation()
+        e.preventDefault()
+        if (!confirm('Are you sure you want to delete this post?')) return
+        deletePost.mutate(post.id, {
+            onSuccess: (res: any) => {
+                toast.success(res.data || 'Post deleted successfully')
+            }
+        })
+    }
+
     return (
         <Card hoverable={true} className="mt-2">
             <Link to={`/post/${post.id}`} className="hover:bg-gray-50">
@@ -34,28 +49,19 @@ const PostItem = ({ post }: any) => {
                         <h3 className="text-lg font-medium text-indigo-600">
                             {post.title}
                         </h3>
-                        <div className=" items-center space-x-2">
-                            {isOwner(post.author?.id) && (
-                                <div className='flex justify-end mr-0'>
-                                    <Link
-                                        to={`/post/${post.id}/edit`}
-                                        className="flex cursor-pointer items-center mt-1 hover:bg-gray-100 p-1 rounded"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <PencilIcon className='h-4 w-4 text-gray-500' />
-                                    </Link>
-                                </div>
-                            )}
-                            <button
-                                onClick={handleLikeToggle}
-                                className="flex items-center space-x-1 p-1 rounded cursor-pointer hover:bg-gray-100"
-                                aria-pressed={post.isLiked}
-                                aria-label={post.isLiked ? 'Unlike' : 'Like'}
-                            >
-                                {post.isLiked ? <ThumbUpSolid className="h-5 w-5 text-indigo-600" /> : <ThumbUpOutline className="h-5 w-5 text-gray-400" />}
-                            </button>
+                        <div className="justify-items-end items-center space-x-2">
+                            <div className='flex'>
+                                <button
+                                    onClick={handleLikeToggle}
+                                    className="flex items-center space-x-1 p-1 rounded cursor-pointer hover:bg-gray-100"
+                                    aria-pressed={post.isLiked}
+                                    aria-label={post.isLiked ? 'Unlike' : 'Like'}
+                                >
+                                    {post.isLiked ? <ThumbUpSolid className="h-5 w-5 text-indigo-600" /> : <ThumbUpOutline className="h-5 w-5 text-gray-400" />}
+                                </button>
+                            </div>
                             <span className={`py-1 text-xs font-medium rounded-full text-gray-500`}>
-                                By: {post.author?.name}
+                                {post.isSystemGenerated ? 'System Generated Post' : `By: ${post.author?.name}`}
                             </span>
                         </div>
                     </div>
@@ -82,9 +88,31 @@ const PostItem = ({ post }: any) => {
                         <span>
                             {post.likeCount ?? 0} Likes • {post.commentCount ?? 0} Comments
                         </span>
-                        <span>
-                            {formatDate(post.createdAt, { year: 'numeric', month: 'short', day: 'numeric' })}
-                        </span>
+                        <div className='flex items-center'>
+                            <div className='mr-2'>
+                                {isOwner(post.author?.id) && (
+                                    <div className='flex justify-end ml-3 mr-0 items-center'>
+                                        <Link
+                                            to={`/post/${post.id}/edit`}
+                                            className="flex cursor-pointer items-center mt-1 hover:bg-gray-100 p-1 rounded"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <PencilIcon className='h-4 w-4 text-gray-500' />
+                                        </Link>
+                                        <button
+                                            onClick={handleDelete}
+                                            className="flex items-center ml-2 p-1 rounded cursor-pointer hover:bg-red-50"
+                                            aria-label="Delete post"
+                                        >
+                                            <TrashIcon className="h-4 w-4 text-red-500" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <span>
+                                {formatDate(post.createdAt, { year: 'numeric', month: 'short', day: 'numeric' })}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </Link>

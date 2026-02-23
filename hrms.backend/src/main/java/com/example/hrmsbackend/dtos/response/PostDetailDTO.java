@@ -15,6 +15,7 @@ public class PostDetailDTO {
     private Integer commentCount;
     private java.util.List<CommentDTO> comments;
     private Boolean isLiked = false;
+    private Boolean isSystemGenerated;
 
     public Long getId() {
         return id;
@@ -102,5 +103,13 @@ public class PostDetailDTO {
 
     public void setComments(java.util.List<CommentDTO> comments) {
         this.comments = comments;
+    }
+
+    public Boolean getIsSystemGenerated() {
+        return isSystemGenerated;
+    }
+
+    public void setIsSystemGenerated(Boolean isSystemGenerated) {
+        this.isSystemGenerated = isSystemGenerated;
     }
 }

@@ -3,6 +3,8 @@ import Loading from '../components/Loading'
 import ServerError from '../components/ServerError'
 import useSinglePostQuery from '../query/queryHooks/useSinglePostQuery'
 import Card from '../components/Card'
+import { Link, useNavigate } from 'react-router'
+import { PencilIcon } from '@heroicons/react/24/outline'
 import formatDate from '../utils/formatDate'
 import UserPill from '../components/UserPill'
 import CommentItem from '../components/CommentItem'
@@ -12,8 +14,12 @@ import useLikePostMutation from '../query/queryHooks/useLikePostMutation'
 import useUnlikePostMutation from '../query/queryHooks/useUnlikePostMutation'
 import useAddCommentMutation from '../query/queryHooks/useAddCommentMutation'
 import { toast } from 'react-toastify'
+import useDeletePostMutation from '../query/queryHooks/useDeletePostMutation'
+import { TrashIcon } from '@heroicons/react/24/outline'
 import { useAuthorization } from '../hooks/useAuthorization'
 import { useState } from 'react'
+import { QUERY_KEY } from '../query/key'
+import { useQueryClient } from '@tanstack/react-query'
 
 const PostDetail = () => {
     const { postId } = useParams()
@@ -21,10 +27,13 @@ const PostDetail = () => {
     const likePost = useLikePostMutation()
     const unlikePost = useUnlikePostMutation()
     const { isOwner } = useAuthorization()
+    const navigate = useNavigate()
     const [commentText, setCommentText] = useState('')
     const [parentCommentId, setParentCommentId] = useState<number | null>(null)
     const [parentCommentAuthor, setParentCommentAuthor] = useState<string | null>(null)
     const addComment = useAddCommentMutation()
+    const deletePost = useDeletePostMutation()
+    const client = useQueryClient();
 
     if (isLoading) return <Loading />
     if (isError) return <ServerError />
@@ -58,6 +67,16 @@ const PostDetail = () => {
         })
     }
 
+    const handleDelete = () => {
+        if (!confirm('Are you sure you want to delete this post?')) return
+        deletePost.mutate(post.id, {
+            onSuccess: (res: any) => {
+                navigate('/post')
+                toast.success(res.data || 'Post deleted successfully')
+            }
+        })
+    }
+
     return (
         <main>
             <div className="mb-6">
@@ -65,12 +84,22 @@ const PostDetail = () => {
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">{post.title}</h1>
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
-                                <div>Posted by <UserPill user={{ image: post.author?.profileMedia?.url, name: post.author?.name }} className="ml-2" /></div>
-                                <div> • {post.createdAt ? formatDate(post.createdAt, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</div>
+                            <div className="flex justify-items-center space-x-4 text-sm text-gray-500">
+                                <div className='flex items-center'>{!post.isSystemGenerated && "Posted by:"} {post.isSystemGenerated ? 'System Generated Post' : <UserPill user={{ image: post.author?.profileMedia?.url, name: post.author?.name }} className="ml-2" />}</div>
                             </div>
+                                <div className='text-gray-500 text-sm'>{post.createdAt ? formatDate(post.createdAt, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</div>
                         </div>
                         <div className="flex items-center space-x-3">
+                            {isOwner(post.author?.id) && (
+                                <>
+                                    <Link to={`/post/${post.id}/edit`} className="flex cursor-pointer items-center p-1 rounded hover:bg-gray-100" onClick={(e) => e.stopPropagation()}>
+                                        <PencilIcon className='h-5 w-5 text-gray-500' />
+                                    </Link>
+                                    <button onClick={handleDelete} className="flex cursor-pointer items-center p-1 rounded hover:bg-red-50" aria-label="Delete post">
+                                        <TrashIcon className='h-5 w-5 text-red-500' />
+                                    </button>
+                                </>
+                            )}
                             <button onClick={handleLikeToggle} className="flex items-center space-x-2 px-3 py-1 rounded hover:bg-gray-100">
                                 {post.isLiked ? <ThumbUpSolid className='h-5 w-5 text-indigo-600' /> : <ThumbUpOutline className='h-5 w-5 text-gray-400' />}
                                 <span className="text-sm text-gray-700">{post.likeCount ?? 0}</span>
@@ -130,7 +159,7 @@ const PostDetail = () => {
                         {post.comments && post.comments.length > 0 ? (
                             <div>
                                 {post.comments.map((c: any) => (
-                                    <CommentItem key={c.id} comment={c} onReply={(id: number, author?: string) => { setParentCommentId(id); setParentCommentAuthor(author || null) }} />
+                                    <CommentItem key={c.id} postId={post.id} comment={c} onReply={(id: number, author?: string) => { setParentCommentId(id); setParentCommentAuthor(author || null) }} />
                                 ))}
                             </div>
                         ) : (

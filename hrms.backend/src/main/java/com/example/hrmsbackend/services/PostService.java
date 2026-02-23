@@ -9,6 +9,7 @@ import com.example.hrmsbackend.entities.*;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.*;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.hrmsbackend.dtos.response.CommentDTO;
 
 @Service
 public class PostService {
@@ -266,17 +269,33 @@ public class PostService {
         Comment comment = commentRepo.findById(commentId).orElse(null);
         if (comment == null) throw new ResourceNotFoundException("Comment not found");
 
-        if (!comment.getPost().getId().equals(postId)) {
-            throw new RuntimeException("Comment does not belong to post");
-        }
+//        if (!comment.getPost().getId().equals(postId)) {
+//            throw new RuntimeException("Comment does not belong to post");
+//        }
 
         Employee current = getCurrentEmployee(userDetails);
         if (!comment.getEmployee().getId().equals(current.getId())) {
             throw new RuntimeException("Unauthorized: only author can delete the comment");
         }
 
-        commentRepo.delete(comment);
+        // delete likes and replies recursively to avoid FK constraint errors, then delete the comment
+        deleteCommentRecursive(comment.getId());
         return "Comment deleted successfully";
+    }
+
+    @Transactional
+    private void deleteCommentRecursive(Long commentId) {
+        // delete likes for this comment
+        likeRepo.deleteByCommentId(commentId);
+        // delete replies recursively
+        List<Comment> replies = commentRepo.findByParentCommentId(commentId);
+        if (replies != null && !replies.isEmpty()) {
+            for (Comment r : replies) {
+                deleteCommentRecursive(r.getId());
+            }
+        }
+        // finally delete the comment itself
+        commentRepo.deleteById(commentId);
     }
 
     @Transactional
@@ -324,10 +343,29 @@ public class PostService {
         if (userDetails != null) {
             Employee current = getCurrentEmployee(userDetails);
             dto.setIsLiked(likeRepo.existsByPostIdAndEmployeeId(postId, current.getId()));
+            // set isLiked for comments recursively
+            if (dto.getComments() != null) {
+                for (com.example.hrmsbackend.dtos.response.CommentDTO c : dto.getComments()) {
+                    markCommentLikedRecursive(c, current.getId());
+                }
+            }
         } else {
             dto.setIsLiked(false);
         }
         return dto;
+    }
+
+    private void markCommentLikedRecursive(CommentDTO comment, Long employeeId) {
+        if (comment == null) return;
+        boolean liked = likeRepo.existsByCommentIdAndEmployeeId(comment.getId(), employeeId);
+        comment.setIsLiked(liked);
+        int count = likeRepo.countByCommentId(comment.getId());
+        comment.setLikeCount(count);
+        if (comment.getReplies() != null) {
+            for (CommentDTO r : comment.getReplies()) {
+                markCommentLikedRecursive(r, employeeId);
+            }
+        }
     }
 
     public List<PostDTO> getAllPosts(UserDetails userDetails) {

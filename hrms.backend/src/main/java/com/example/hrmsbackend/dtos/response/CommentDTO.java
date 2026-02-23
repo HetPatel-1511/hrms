@@ -9,6 +9,8 @@ public class CommentDTO {
     private EmployeeSummaryDTO employee;
     private LocalDateTime createdAt;
     private List<CommentDTO> replies;
+    private Integer likeCount;
+    private Boolean isLiked = false;
 
     public Long getId() {
         return id;
@@ -48,5 +50,21 @@ public class CommentDTO {
 
     public void setReplies(List<CommentDTO> replies) {
         this.replies = replies;
+    }
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public Boolean getIsLiked() {
+        return isLiked;
+    }
+
+    public void setIsLiked(Boolean isLiked) {
+        this.isLiked = isLiked;
     }
 }

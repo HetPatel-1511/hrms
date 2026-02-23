@@ -15,6 +15,7 @@ public class PostDTO {
     private Integer likeCount;
     private Integer commentCount;
     private Boolean isLiked = false;
+    private Boolean isSystemGenerated;
 
     public Long getId() {
         return id;
@@ -94,5 +95,13 @@ public class PostDTO {
 
     public void setIsLiked(Boolean isLiked) {
         this.isLiked = isLiked;
+    }
+
+    public Boolean getIsSystemGenerated() {
+        return isSystemGenerated;
+    }
+
+    public void setIsSystemGenerated(Boolean isSystemGenerated) {
+        this.isSystemGenerated = isSystemGenerated;
     }
 }

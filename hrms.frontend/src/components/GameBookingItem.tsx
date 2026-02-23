@@ -64,8 +64,8 @@ const GameBookingItem = ({ booking }: any) => {
                                                 <p className="text-sm font-medium text-gray-900">
                                                     {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                                                 </p>
-                                                <p className="text-xs text-gray-500">
-                                                    Status: {slot.bookingStatus}
+                                                <p>
+                                                    Status: <span className={`px-2 rounded-2xl ${slot.bookingStatus === 'CONFIRMED' ? 'text-xs text-green-500 bg-green-100' : slot.bookingStatus === 'WAITING' ? 'text-xs text-yellow-500 bg-yellow-100' : 'text-xs text-red-500 bg-red-100'}`}>{slot.bookingStatus}</span>
                                                 </p>
                                             </div>
                                             {slot.bookedBy && (

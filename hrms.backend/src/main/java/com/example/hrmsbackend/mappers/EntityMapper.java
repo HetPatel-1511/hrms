@@ -302,6 +302,8 @@ public class EntityMapper {
         if (comment.getReplies() != null) {
             dto.setReplies(comment.getReplies().stream().map(this::toCommentDTO).toList());
         }
+        dto.setLikeCount(0);
+        dto.setIsLiked(false);
         return dto;
     }
 
@@ -327,6 +329,7 @@ public class EntityMapper {
     public PostDTO toPostDTO(Post post) {
         if (post == null) return null;
         PostDTO dto = modelMapper.map(post, PostDTO.class);
+        dto.setIsSystemGenerated(post.getSystemGenerated());
         if (post.getAuthor() != null) dto.setAuthor(toEmployeeSummaryDTO(post.getAuthor()));
         if (post.getPostTags() != null) {
             dto.setTags(post.getPostTags().stream().map(pt -> toTagDTO(pt.getTag())).toList());
@@ -335,7 +338,7 @@ public class EntityMapper {
             dto.setMedia(toMediaResponseDTO(post.getMedia()));
         }
         dto.setLikeCount(post.getLikes() != null ? post.getLikes().size() : 0);
-        dto.setCommentCount(post.getComments() != null ? post.getComments().size() : 0);
+        dto.setCommentCount(countCommentsRecursive(post.getComments()));
         return dto;
     }
 
@@ -347,6 +350,7 @@ public class EntityMapper {
     public PostDetailDTO toPostDetailDTO(Post post) {
         if (post == null) return null;
         PostDetailDTO dto = modelMapper.map(post, PostDetailDTO.class);
+        dto.setIsSystemGenerated(post.getSystemGenerated());
         if (post.getAuthor() != null) {
             dto.setAuthor(toEmployeeSummaryDTO(post.getAuthor()));
         }
@@ -357,8 +361,20 @@ public class EntityMapper {
             dto.setMedia(toMediaResponseDTO(post.getMedia()));
         }
         dto.setLikeCount(post.getLikes() != null ? post.getLikes().size() : 0);
-        dto.setCommentCount(post.getComments() != null ? post.getComments().size() : 0);
+        dto.setCommentCount(countCommentsRecursive(post.getComments()));
         dto.setComments(toCommentDTOList(post.getComments()));
         return dto;
+    }
+
+    private int countCommentsRecursive(List<Comment> comments) {
+        if (comments == null || comments.isEmpty()) return 0;
+        int count = 0;
+        for (Comment c : comments) {
+            count += 1;
+            if (c.getReplies() != null && !c.getReplies().isEmpty()) {
+                count += countCommentsRecursive(c.getReplies());
+            }
+        }
+        return count;
     }
 }

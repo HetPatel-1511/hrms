@@ -34,3 +34,23 @@ export const addComment = async ({ postId, data }: any) => {
     const res = await axios.post(`/posts/${postId}/comments`, data);
     return res.data
 }
+
+export const deleteComment = async ({ postId, commentId }: any) => {
+    const res = await axios.delete(`/posts/${postId}/comments/${commentId}`);
+    return res.data
+}
+
+export const likeComment = async ({ postId, commentId }: any) => {
+    const res = await axios.post(`/posts/${postId}/comments/${commentId}/like`);
+    return res.data
+}
+
+export const unlikeComment = async ({ postId, commentId }: any) => {
+    const res = await axios.delete(`/posts/${postId}/comments/${commentId}/like`);
+    return res.data
+}
+
+export const deletePost = async (postId: any) => {
+    const res = await axios.delete(`/posts/${postId}`);
+    return res.data
+}
