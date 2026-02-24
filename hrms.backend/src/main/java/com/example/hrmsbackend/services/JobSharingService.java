@@ -9,6 +9,7 @@ import com.example.hrmsbackend.entities.*;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.example.hrmsbackend.dtos.request.BulkNotificationCreateRequestDTO;
+import com.example.hrmsbackend.dtos.request.NotificationCreateRequestDTO;
 
 @Service
 public class JobSharingService {
@@ -29,12 +34,13 @@ public class JobSharingService {
     private EmailService emailService;
     private MediaService mediaService;
     private EntityMapper entityMapper;
+    private NotificationService notificationService;
 
     @Autowired
-    public JobSharingService(JobOpeningRepo jobOpeningRepo, SharedJobRepo sharedJobRepo, 
-                           ReferalRepo referalRepo, EmployeeRepo employeeRepo, 
-                           ConfigurationRepo configurationRepo, EmailService emailService,
-                           MediaService mediaService, EntityMapper entityMapper) {
+    public JobSharingService(JobOpeningRepo jobOpeningRepo, SharedJobRepo sharedJobRepo,
+                             ReferalRepo referalRepo, EmployeeRepo employeeRepo,
+                             ConfigurationRepo configurationRepo, EmailService emailService,
+                             MediaService mediaService, EntityMapper entityMapper, NotificationService notificationService) {
         this.jobOpeningRepo = jobOpeningRepo;
         this.sharedJobRepo = sharedJobRepo;
         this.referalRepo = referalRepo;
@@ -43,6 +49,7 @@ public class JobSharingService {
         this.emailService = emailService;
         this.mediaService = mediaService;
         this.entityMapper = entityMapper;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -168,5 +175,17 @@ public class JobSharingService {
         emailDetails.setAttachment(cvMedia.getUrl());
         
         emailService.sendMailWithAttachment(emailDetails);
+
+        BulkNotificationCreateRequestDTO notificationRequest = new BulkNotificationCreateRequestDTO();
+        notificationRequest.setTitle("New Referral for " + jobOpening.getTitle());
+        notificationRequest.setMessage("A new referral has been received for the job opening: " + jobOpening.getTitle() + ". Please check your email for details.");
+        notificationRequest.setUserIds(recipients.stream().map(email -> {
+            Employee employee = employeeRepo.findByEmail(email);
+            if (employee!=null) {
+                return employee.getId();
+            }
+            return null;
+        }).filter(eid->eid!=null).collect(Collectors.toList()));
+        notificationService.createBulkNotification(notificationRequest);
     }
 }

@@ -11,4 +11,6 @@ export const QUERY_KEY = {
     JOB_OPENINGS: "jobOpenings",
     GAMES: "games",
     POSTS: "posts",
+    NOTIFICATIONS: "notifications",
+    NOTIFICATIONS_UNREAD: "notificationsUnread",
 }

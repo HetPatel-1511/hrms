@@ -377,4 +377,26 @@ public class EntityMapper {
         }
         return count;
     }
+
+    public NotificationDTO toNotificationDTO(Notification notification) {
+        if (notification == null) return null;
+        NotificationDTO dto = new NotificationDTO();
+        dto.setId(notification.getId());
+        dto.setTitle(notification.getTitle());
+        dto.setMessage(notification.getMessage());
+        dto.setCreatedAt(notification.getCreatedAt());
+        return dto;
+    }
+
+    public NotificationWithReadStatusDTO toNotificationWithReadStatusDTO(NotificationEmployee notificationEmployee) {
+        if (notificationEmployee == null) return null;
+        Notification notification = notificationEmployee.getNotification();
+        NotificationWithReadStatusDTO dto = new NotificationWithReadStatusDTO();
+        dto.setId(notification.getId());
+        dto.setTitle(notification.getTitle());
+        dto.setMessage(notification.getMessage());
+        dto.setIsRead(notificationEmployee.getIsRead());
+        dto.setCreatedAt(notification.getCreatedAt());
+        return dto;
+    }
 }

@@ -8,4 +8,13 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  resolve: {
+    alias: {
+      global: 'globalThis'
+    }
+  },
+  define: {
+    global: 'globalThis'
+  }
 })
+

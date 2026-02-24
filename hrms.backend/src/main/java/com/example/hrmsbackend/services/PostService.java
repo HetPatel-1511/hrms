@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.hrmsbackend.dtos.request.BulkNotificationCreateRequestDTO;
 import com.example.hrmsbackend.dtos.response.CommentDTO;
 
 @Service
@@ -32,9 +33,10 @@ public class PostService {
     private final MediaService mediaService;
     private final EntityMapper entityMapper;
     private final LikeRepo likeRepo;
+    private final NotificationService notificationService;
 
     @Autowired
-    public PostService(PostRepo postRepo, TagRepo tagRepo, PostTagRepo postTagRepo, EmployeeRepo employeeRepo, CommentRepo commentRepo, MediaService mediaService, EntityMapper entityMapper, LikeRepo likeRepo) {
+    public PostService(PostRepo postRepo, TagRepo tagRepo, PostTagRepo postTagRepo, EmployeeRepo employeeRepo, CommentRepo commentRepo, MediaService mediaService, EntityMapper entityMapper, LikeRepo likeRepo, NotificationService notificationService) {
         this.postRepo = postRepo;
         this.tagRepo = tagRepo;
         this.postTagRepo = postTagRepo;
@@ -43,6 +45,7 @@ public class PostService {
         this.mediaService = mediaService;
         this.entityMapper = entityMapper;
         this.likeRepo = likeRepo;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -68,6 +71,18 @@ public class PostService {
         Post saved = postRepo.save(post);
 
         saveTags(request, saved);
+
+        // create notification for all employees except the author
+        List<Employee> allEmployees = employeeRepo.findAll();
+        List<Employee> allEmployeesExceptAuthor = allEmployees.stream()
+                .filter(e -> !e.getId().equals(author.getId()))
+                .toList();
+        
+        BulkNotificationCreateRequestDTO notificationRequest = new BulkNotificationCreateRequestDTO();
+        notificationRequest.setTitle("New post: " + saved.getTitle());
+        notificationRequest.setMessage(author.getName() + " has created a new post: " + saved.getTitle());
+        notificationRequest.setUserIds(allEmployeesExceptAuthor.stream().map(Employee::getId).toList());
+        notificationService.createBulkNotification(notificationRequest);
 
         return "Post created successfully";
     }
