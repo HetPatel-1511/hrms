@@ -3,6 +3,7 @@ package com.example.hrmsbackend.services;
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
 import com.example.hrmsbackend.dtos.request.ExpenseCreateRequestDTO;
 import com.example.hrmsbackend.dtos.request.ExpenseStatusRequestDTO;
+import com.example.hrmsbackend.dtos.request.NotificationCreateRequestDTO;
 import com.example.hrmsbackend.dtos.response.ExpenseListResponseDTO;
 import com.example.hrmsbackend.dtos.response.ExpenseResponseDTO;
 import com.example.hrmsbackend.entities.*;
@@ -33,9 +34,10 @@ public class ExpenseService {
     private TravelPlanRepo travelPlanRepo;
     private ConfigurationRepo configurationRepo;
     private ExpenseMediaRepo expenseMediaRepo;
+    private NotificationService notificationService;
 
     @Autowired
-    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo, TravelPlanRepo travelPlanRepo, ConfigurationRepo configurationRepo, ExpenseMediaRepo expenseMediaRepo) {
+    public ExpenseService(ExpenseRepo expenseRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, MediaService mediaService, EntityMapper entityMapper, EmailService emailService, EmployeeRepo employeeRepo, TravelPlanRepo travelPlanRepo, ConfigurationRepo configurationRepo, ExpenseMediaRepo expenseMediaRepo, NotificationService notificationService) {
         this.expenseRepo = expenseRepo;
         this.travelPlanEmployeeRepo = travelPlanEmployeeRepo;
         this.mediaService = mediaService;
@@ -45,6 +47,7 @@ public class ExpenseService {
         this.travelPlanRepo = travelPlanRepo;
         this.configurationRepo = configurationRepo;
         this.expenseMediaRepo = expenseMediaRepo;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -164,6 +167,12 @@ public class ExpenseService {
 
         updateExpenseStatus(expense, dto, userDetails);
         expenseRepo.save(expense);
+
+        NotificationCreateRequestDTO notificationDTO = new NotificationCreateRequestDTO();
+        notificationDTO.setUserId(expense.getTravelPlanEmployee().getEmployee().getId());
+        notificationDTO.setTitle("Expense " + dto.getStatus());
+        notificationDTO.setMessage("Your expense of amount " + expense.getAmount() + " for travel to " + expense.getTravelPlanEmployee().getTravelPlan().getPlace() + " has been " + dto.getStatus().toLowerCase() + ".");
+        notificationService.createNotification(notificationDTO);
 
         return entityMapper.toExpenseResponseDTO(expense);
     }
