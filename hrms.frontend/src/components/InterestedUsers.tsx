@@ -1,13 +1,33 @@
+import { useEffect, useState } from 'react'
 import UserAvatar from './UserAvatar'
+import { SearchHeader } from './SearchHeader';
 
 const InterestedUsers = ({ users, selectedUsers, onUserToggle }: any) => {
+    const [displayingUsers, setDisplayingUsers] = useState(users);
+    const [search, setSearch] = useState('');
+
+    useEffect(() => {
+        if (search.trim() === '') {
+            setDisplayingUsers(users);
+        } else {
+            const lowerSearch = search.toLowerCase();
+            setDisplayingUsers(users.filter((user: any) =>
+                user.name.toLowerCase().includes(lowerSearch) ||
+                user.email.toLowerCase().includes(lowerSearch)
+            ));
+        }
+    }, [search, users]);
     return (
         <div className="px-6 py-4">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Interested Users ({users.length})
             </h2>
+            <SearchHeader 
+                searchValue={search} 
+                onSearchChange={(e: any) => setSearch(e.target.value)} 
+            />
             <div className="space-y-2 max-h-96 overflow-y-auto">
-                {users.map((user: any) => (
+                {displayingUsers.map((user: any) => (
                     <div
                         key={user.id}
                         onClick={() => onUserToggle(user.id.toString())}
