@@ -27,6 +27,9 @@ public interface GameBookingRepo extends JpaRepository<GameBooking, Long> {
     @Query("SELECT gb FROM GameBooking gb WHERE gb.gameSlot.game.id = :gameId AND gb.bookedBy = :employee AND gb.gameSlot.slotDate = :date AND gb.bookingStatus IN ('WAITING', 'CONFIRMED')")
     List<GameBooking> findEmployeeBookingsForDate(@Param("employee") Employee employee, @Param("date") LocalDate date, @Param("gameId") Long gameId);
 
+    @Query("SELECT gb FROM GameBooking gb WHERE gb.gameSlot.id = :slotId AND gb.bookingStatus = 'CONFIRMED'")
+    List<GameBooking> findConfirmedBookingsBySlotId(@Param("slotId") Long slotId);
+
     @Query("SELECT gb FROM GameBooking gb WHERE gb.bookedBy = :employee OR gb.id IN (SELECT egb.gameBooking.id FROM EmployeeGameBooking egb WHERE egb.employee = :employee)")
     List<GameBooking> findEmployeeGameBookings(@Param("employee") Employee employee);
 

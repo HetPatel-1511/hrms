@@ -142,4 +142,34 @@ public class GameSlotSchedulerService {
             }
         }
     }
+
+    @Scheduled(fixedDelay = 300000) // checks every 5 minutes
+    @Transactional
+    public void markCompletedSlots() {
+        System.out.println("Checking for completed game slots");
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+        List<GameSlot> slotsToCheck = gameSlotRepo.findBySlotDate(today);
+
+        slotsToCheck = slotsToCheck.stream()
+                .filter(slot -> ("BOOKED".equals(slot.getSlotStatus()) || "AVAILABLE".equals(slot.getSlotStatus())) &&
+                        slot.getEndTime().isBefore(currentTime))
+                .toList();
+
+        for (GameSlot slot : slotsToCheck) {
+            try {
+                System.out.println("Marking slot as completed for game: " + slot.getGame().getName() + " ending at: " + slot.getEndTime());
+                slot.setSlotStatus("COMPLETED");
+                gameSlotRepo.save(slot);
+
+                // Update associated bookings with CONFIRMED status to COMPLETED
+                gameService.markAssociatedBookingsAsCompleted(slot.getId());
+
+                System.out.println("Slot marked as completed: " + slot.getId());
+            } catch (Exception e) {
+                System.out.println("Error marking slot as completed for game: " + slot.getGame().getName() + " - " + e.getMessage());
+            }
+        }
+    }
 }

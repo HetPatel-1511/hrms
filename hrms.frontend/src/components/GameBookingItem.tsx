@@ -48,7 +48,7 @@ const GameBookingItem = ({ booking }: any) => {
                         {booking.game.name}
                     </h3>
                 </div>
-                
+
                 <div className="space-y-2">
                     {booking.booking.map((dateBooking: any) => (
                         <div key={dateBooking.slotDate} className="border border-gray-200 rounded-lg p-3">
@@ -58,60 +58,70 @@ const GameBookingItem = ({ booking }: any) => {
                             <div className="space-y-2">
                                 {dateBooking.slotTimes.map((slot: any) => (
                                     <div className="border-b border-gray-200 pb-4">
-                                    <div key={slot.slotId} className="flex items-center justify-between py-2 rounded">
-                                        <div className="flex items-center space-x-3">
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                                                </p>
-                                                <p>
-                                                    Status: <span className={`px-2 rounded-2xl ${slot.bookingStatus === 'CONFIRMED' ? 'text-xs text-green-500 bg-green-100' : slot.bookingStatus === 'WAITING' ? 'text-xs text-yellow-500 bg-yellow-100' : 'text-xs text-red-500 bg-red-100'}`}>{slot.bookingStatus}</span>
-                                                </p>
-                                            </div>
-                                            {slot.bookedBy && (
-                                                <div className="flex items-center space-x-2">
-                                                    <UserAvatar 
-                                                        user={{ image: slot.bookedBy.profileMedia?.url }} 
-                                                        className="h-6 w-6" 
-                                                    />
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">
-                                                            {slot.bookedBy.name}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {slot.bookedBy.email}
-                                                        </p>
-                                                    </div>
+                                        <div key={slot.slotId} className="flex items-center justify-between py-2 rounded">
+                                            <div className="flex items-center space-x-3">
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                                                    </p>
+                                                    <p>
+                                                        Status: <span className={`px-2 rounded-2xl 
+                                                            ${slot.bookingStatus === 'CONFIRMED'
+                                                                ? 'text-xs text-green-500 bg-green-100'
+                                                                : slot.bookingStatus === 'WAITING'
+                                                                    ? 'text-xs text-yellow-500 bg-yellow-100'
+                                                                    : slot.bookingStatus === 'CANCELLED' || slot.bookingStatus === 'NOT_ALLOCATED'
+                                                                        ? 'text-xs text-red-500 bg-red-100'
+                                                                        : 'text-xs text-blue-500 bg-blue-100'
+                                                            }
+                                                        `}
+                                                        >{slot.bookingStatus}</span>
+                                                    </p>
                                                 </div>
-                                            )}
+                                                {slot.bookedBy && (
+                                                    <div className="flex items-center space-x-2">
+                                                        <UserAvatar
+                                                            user={{ image: slot.bookedBy.profileMedia?.url }}
+                                                            className="h-6 w-6"
+                                                        />
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {slot.bookedBy.name}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {slot.bookedBy.email}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                {slot.bookingStatus !== 'CANCELLED'
+                                                    && slot.bookingStatus !== 'COMPLETED'
+                                                    && isOwner(slot.bookedBy.id)
+                                                    && isBookingInFuture(dateBooking.slotDate, slot.startTime)
+                                                    && (
+                                                        <Button
+                                                            onClick={() => handleCancelBooking(slot.bookingId)}
+                                                            disabled={cancelBooking.isPending}
+                                                            className="text-xs px-2 py-1"
+                                                        >
+                                                            {cancelBooking.isPending ? 'Canceling...' : 'Cancel'}
+                                                        </Button>
+                                                    )
+                                                }
+                                            </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            {slot.bookingStatus !== 'CANCELLED'
-                                                && slot.bookingStatus !== 'COMPLETED'
-                                                && isOwner(slot.bookedBy.id)
-                                                && isBookingInFuture(dateBooking.slotDate, slot.startTime)
-                                                && (
-                                                    <Button
-                                                        onClick={() => handleCancelBooking(slot.bookingId)}
-                                                        disabled={cancelBooking.isPending}
-                                                        className="text-xs px-2 py-1"
-                                                    >
-                                                        {cancelBooking.isPending ? 'Canceling...' : 'Cancel'}
-                                                    </Button>
-                                                )
-                                            }
-                                        </div>
-                                    </div>
-                                    <div>
-                                        {slot.playedWith && slot.playedWith.length > 0 && (
+                                        <div>
+                                            {slot.playedWith && slot.playedWith.length > 0 && (
                                                 <div className="flex-1">
                                                     <p className="text-xs text-gray-500 mb-2">Played with:</p>
                                                     <div className="space-y-1">
                                                         {slot.playedWith.map((player: any) => (
                                                             <div key={player.id} className="flex items-center space-x-2 p-1 rounded">
-                                                                <UserAvatar 
-                                                                    user={{ image: player.profileMedia?.url }} 
-                                                                    className="h-4 w-4" 
+                                                                <UserAvatar
+                                                                    user={{ image: player.profileMedia?.url }}
+                                                                    className="h-4 w-4"
                                                                 />
                                                                 <div className="flex-1">
                                                                     <p className="text-xs font-medium text-gray-900">{player.name}</p>
@@ -122,7 +132,7 @@ const GameBookingItem = ({ booking }: any) => {
                                                     </div>
                                                 </div>
                                             )}
-                                    </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

@@ -26,4 +26,7 @@ public interface GameSlotRepo extends JpaRepository<GameSlot, Long> {
 
     @Query("SELECT gs FROM GameSlot gs WHERE gs.slotDate = :date AND gs.slotStatus IN ('AVAILABLE')")
     List<GameSlot> findUpcomingSlots(@Param("date") LocalDate date);
+
+    @Query("SELECT gs FROM GameSlot gs WHERE gs.slotDate = :date")
+    List<GameSlot> findBySlotDate(@Param("date") LocalDate date);
 }

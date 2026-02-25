@@ -406,6 +406,14 @@ public class GameService {
         }
 
         GameBooking selectedBooking = findFairBooking(waitingBookings, gameSlot.getSlotDate(), gameSlot.getGame());
+
+        // set booking status of non-selected waiting bookings to NOT_ALLOCATED
+        for (GameBooking booking : waitingBookings) {
+            if (!booking.getId().equals(selectedBooking.getId())) {
+                booking.setBookingStatus("NOT_ALLOCATED");
+                gameBookingRepo.save(booking);
+            }
+        }
         
         selectedBooking.setBookingStatus("CONFIRMED");
         gameSlot.setSlotStatus("BOOKED");
@@ -535,6 +543,17 @@ public class GameService {
         gameRepo.save(game);
         
         return "Game configuration updated successfully";
+    }
+
+    @Transactional
+    public void markAssociatedBookingsAsCompleted(Long slotId) {
+        List<GameBooking> confirmedBookings = gameBookingRepo.findConfirmedBookingsBySlotId(slotId);
+        
+        for (GameBooking booking : confirmedBookings) {
+            booking.setBookingStatus("COMPLETED");
+            gameBookingRepo.save(booking);
+            System.out.println("Booking marked as completed: " + booking.getId());
+        }
     }
 
     private record GameResult(Game game, GameConfiguration savedGameConfiguration) {
