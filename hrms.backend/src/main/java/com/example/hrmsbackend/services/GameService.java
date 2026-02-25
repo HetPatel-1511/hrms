@@ -238,6 +238,104 @@ public class GameService {
                 .collect(Collectors.toList());
     }
 
+    public List<UpcomingGameSlotBookingResponseDTO> getUpcomingSlotsBookings(CustomUserDetails userDetails) {
+        // Get the logged-in employee
+        Employee employee = employeeRepo.findByEmail(userDetails.getUsername());
+        
+        // Get all games the employee is interested in
+        Set<Game> interestedGames = employee.getGamesInterestedIn();
+
+        // sort by game id to ensure consistent order of games in response
+        List<Game> interestedGamesList = interestedGames.stream()
+                .sorted(Comparator.comparing(Game::getId))
+                .toList();
+        
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        
+        List<UpcomingGameSlotBookingResponseDTO> response = new ArrayList<>();
+        
+        // For each interested game
+        for (Game game : interestedGamesList) {
+            // Get upcoming slots for the game
+            List<GameSlot> slots = gameSlotRepo.findAllUpcomingSlotsByGameId(game.getId(), currentDate);
+            
+            // Filter upcoming slots (after current time if today)
+            List<GameSlot> upcomingSlots = slots.stream()
+                    .filter(slot -> {
+                        if (slot.getSlotDate().isEqual(currentDate)) {
+                            return slot.getStartTime().isAfter(currentTime);
+                        }
+                        return true;
+                    })
+                    .limit(2) // Get only the first 2 slots
+                    .collect(Collectors.toList());
+            
+            if (!upcomingSlots.isEmpty()) {
+                // Get all bookings for these slots
+                List<GameBooking> slotBookings = gameBookingRepo.findGameBookingBySlots(upcomingSlots);
+                
+                // Map bookings by slot ID
+                Map<Long, List<GameBooking>> bookingsBySlotId = slotBookings.stream()
+                        .collect(Collectors.groupingBy(booking -> booking.getGameSlot().getId()));
+                
+                // Create the response DTO
+                UpcomingGameSlotBookingResponseDTO gameResponse = new UpcomingGameSlotBookingResponseDTO();
+                gameResponse.setGame(entityMapper.toGameResponseDTO(game));
+                
+                // Create slot time details
+                List<SlotTimeDetailsDTO> slotTimeDTOs = new ArrayList<>();
+                for (GameSlot slot : upcomingSlots) {
+                    SlotTimeDetailsDTO slotTimeDTO = new SlotTimeDetailsDTO();
+                    slotTimeDTO.setStartTime(slot.getStartTime());
+                    slotTimeDTO.setEndTime(slot.getEndTime());
+                    slotTimeDTO.setSlotStatus(slot.getSlotStatus());
+                    slotTimeDTO.setSlotId(slot.getId());
+                    
+                    // Set bookings only if slot is booked
+                    if (slot.getSlotStatus().equals("BOOKED")) {
+                        List<GameBooking> bookingsForSlot = bookingsBySlotId.getOrDefault(slot.getId(), new ArrayList<>());
+                        List<SlotBookingResponseDTO> bookingResponses = new ArrayList<>();
+                        
+                        for (GameBooking booking : bookingsForSlot) {
+                            if (!booking.getBookingStatus().equals("CONFIRMED")) {
+                                continue;
+                            }
+                            SlotBookingResponseDTO bookingResponse = new SlotBookingResponseDTO();
+                            bookingResponse.setBookedBy(entityMapper.toEmployeeSummaryDTO(booking.getBookedBy()));
+                            bookingResponse.setBookingId(booking.getId());
+                            bookingResponse.setBookingStatus(booking.getBookingStatus());
+                            bookingResponse.setCreatedAt(booking.getCreatedAt());
+                            bookingResponse.setCancelledAt(booking.getCancelledAt());
+                            
+                            // Get the players (employees who played with the booker)
+                            List<EmployeeSummaryDTO> playedWith = booking.getEmployeeGameBookings().stream()
+                                    .map(egb -> egb.getEmployee())
+                                    .filter(emp -> !emp.getId().equals(booking.getBookedBy().getId()))
+                                    .map(emp -> entityMapper.toEmployeeSummaryDTO(emp))
+                                    .collect(Collectors.toList());
+                            
+                            bookingResponse.setPlayedWith(playedWith);
+                            bookingResponses.add(bookingResponse);
+                        }
+                        
+                        slotTimeDTO.setBookings(bookingResponses);
+                    } else {
+                        // If slot is not booked, bookings should be null
+                        slotTimeDTO.setBookings(null);
+                    }
+                    
+                    slotTimeDTOs.add(slotTimeDTO);
+                }
+                
+                gameResponse.setSlots(slotTimeDTOs);
+                response.add(gameResponse);
+            }
+        }
+        
+        return response;
+    }
+
     @Transactional
     public String interested(Long gameId, CustomUserDetails userDetails) {
         Game game = gameRepo.findById(gameId).orElseThrow(()-> new ResourceNotFoundException("Game with ID: " + gameId + " doesn't exist"));

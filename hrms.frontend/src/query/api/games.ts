@@ -54,3 +54,8 @@ export const updateGameInterest = async (gameId: string) => {
     const res = await axios.post(`/games/${gameId}/interested`);
     return res.data
 }
+
+export const fetchUpcomingSlotsBookings = async () => {
+    const res = await axios.get(`/games/upcoming-slots/booking`);
+    return res.data
+}

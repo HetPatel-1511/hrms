@@ -3,6 +3,7 @@ package com.example.hrmsbackend.repos;
 import com.example.hrmsbackend.entities.Game;
 import com.example.hrmsbackend.entities.GameBooking;
 import com.example.hrmsbackend.entities.Employee;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.example.hrmsbackend.entities.GameSlot;
 
 @Repository
 public interface GameBookingRepo extends JpaRepository<GameBooking, Long> {
@@ -26,4 +29,7 @@ public interface GameBookingRepo extends JpaRepository<GameBooking, Long> {
 
     @Query("SELECT gb FROM GameBooking gb WHERE gb.bookedBy = :employee OR gb.id IN (SELECT egb.gameBooking.id FROM EmployeeGameBooking egb WHERE egb.employee = :employee)")
     List<GameBooking> findEmployeeGameBookings(@Param("employee") Employee employee);
+
+    @Query("SELECT gb FROM GameBooking gb WHERE gb.gameSlot IN :slots")
+    List<GameBooking> findGameBookingBySlots(@Param("slots") List<GameSlot> slots);
 }

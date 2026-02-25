@@ -62,6 +62,11 @@ public class GameController {
         return ResponseEntity.ok(ResponseUtil.success(gameService.getUpcomingSlotsForGame(gameId), "Upcoming slots fetched successfully", 200));
     }
 
+    @GetMapping("/upcoming-slots/booking")
+    public ResponseEntity<ApiResponse<List<UpcomingGameSlotBookingResponseDTO>>> getUpcomingSlotsBookings(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ResponseUtil.success(gameService.getUpcomingSlotsBookings(userDetails), "Upcoming slots fetched successfully", 200));
+    }
+
     @GetMapping("/employees/{employeeId}/booking")
     public ResponseEntity<ApiResponse<List<GameBookingResponseDTO>>> getBookings(@PathVariable Long employeeId) {
         return ResponseEntity.ok(ResponseUtil.success(gameService.getBookings(employeeId), "Game bookings fetched successfully", 200));

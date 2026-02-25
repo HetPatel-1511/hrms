@@ -2,6 +2,7 @@ import { Outlet } from "react-router";
 import UnAuthLayout from "../components/UnAuthLayout";
 import AuthLayout from "../components/AuthLayout";
 import Login from "../pages/Login";
+import Home from "../pages/Home";
 import TravelPlan from "../pages/TravelPlan";
 import AddTravelPlan from "../pages/AddTravelPlan";
 import SingleTravelPlan from "../pages/SingleTravelPlan";
@@ -36,6 +37,10 @@ export default [
         path: "/",
         element: <AuthLayout />,
         children: [
+            {
+                index: true,
+                element: <Home />,
+            },
             {
                 path: "travel-plan",
                 children: [

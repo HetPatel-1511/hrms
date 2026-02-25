@@ -73,7 +73,7 @@ public class EntityMapper {
     }
 
     // Travel Plan
-    public TravelPlanResponseDTO toTravelPlanResponseDTO(TravelPlan travelPlan) {
+        public TravelPlanResponseDTO toTravelPlanResponseDTO(TravelPlan travelPlan) {
         if (travelPlan == null) return null;
         TravelPlanResponseDTO dto = modelMapper.map(travelPlan, TravelPlanResponseDTO.class);
         if (travelPlan.getTravelPlanEmployees() != null) {
