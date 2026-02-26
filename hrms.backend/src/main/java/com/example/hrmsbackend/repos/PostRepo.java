@@ -2,6 +2,7 @@ package com.example.hrmsbackend.repos;
 
 import com.example.hrmsbackend.entities.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostRepo extends JpaRepository<Post, Long> {
+public interface PostRepo extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
     List<Post> findAllByOrderByCreatedAtDesc();
 
     @Query("select p from Post p where p.id = :id and p.isDeleted = false")

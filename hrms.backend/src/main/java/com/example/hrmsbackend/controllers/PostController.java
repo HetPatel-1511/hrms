@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -113,8 +114,14 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostDTO>>> getAllPosts(@AuthenticationPrincipal UserDetails userDetails) {
-        List<PostDTO> list = postService.getAllPosts(userDetails);
+    public ResponseEntity<ApiResponse<List<PostDTO>>> getAllPosts(
+            @RequestParam(required = false) Long authorId,
+            @RequestParam(required = false) String tagName,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) String searchQuery,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        List<PostDTO> list = postService.filterPosts(authorId, tagName, startDate, endDate, searchQuery, userDetails);
         return ResponseEntity.ok(ResponseUtil.success(list, "Posts fetched successfully", 200));
     }
 }

@@ -1,7 +1,16 @@
 import axios from "../../axios"
 
-export const fetchPosts = async () => {
-    const res = await axios.get(`/posts`);
+export const fetchPosts = async (filters?: any) => {
+    const params = new URLSearchParams();
+    if (filters?.authorId) params.append('authorId', filters.authorId);
+    if (filters?.tagName) params.append('tagName', filters.tagName);
+    if (filters?.startDate) params.append('startDate', filters.startDate);
+    if (filters?.endDate) params.append('endDate', filters.endDate);
+    if (filters?.searchQuery) params.append('searchQuery', filters.searchQuery);
+    
+    const queryString = params.toString();
+    const url = queryString ? `/posts?${queryString}` : '/posts';
+    const res = await axios.get(url);
     return res.data
 }
 

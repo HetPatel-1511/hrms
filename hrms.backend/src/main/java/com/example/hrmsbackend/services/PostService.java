@@ -9,6 +9,7 @@ import com.example.hrmsbackend.entities.*;
 import com.example.hrmsbackend.exceptions.ResourceNotFoundException;
 import com.example.hrmsbackend.mappers.EntityMapper;
 import com.example.hrmsbackend.repos.*;
+import com.example.hrmsbackend.utils.PostSpecification;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
 
 import com.example.hrmsbackend.dtos.request.BulkNotificationCreateRequestDTO;
 import com.example.hrmsbackend.dtos.response.CommentDTO;
@@ -383,8 +385,16 @@ public class PostService {
         }
     }
 
-    public List<PostDTO> getAllPosts(UserDetails userDetails) {
-        List<Post> posts = postRepo.findAllActiveOrderByCreatedAtDesc();
+    public List<PostDTO> filterPosts(Long authorId, String tagName, LocalDate startDate,
+                                     LocalDate endDate, String searchQuery, UserDetails userDetails) {
+        // Build specification based on provided filters
+        org.springframework.data.jpa.domain.Specification<Post> specification = 
+            PostSpecification.filterPosts(authorId, tagName, startDate, endDate, searchQuery);
+
+        // Execute query with specification
+        List<Post> posts = postRepo.findAll(specification);
+
+        // Map to DTOs
         List<PostDTO> dtos = new ArrayList<>();
         for (Post post : posts) {
             PostDTO dto = entityMapper.toPostDTO(post);

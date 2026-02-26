@@ -14,7 +14,7 @@ import useUnlikePostMutation from '../query/queryHooks/useUnlikePostMutation'
 import useDeletePostMutation from '../query/queryHooks/useDeletePostMutation'
 import { toast } from 'react-toastify'
 
-const PostItem = ({ post }: any) => {
+const PostItem = ({ post, onTagClick }: any) => {
     const { isOwner } = useAuthorization()
     const likePost = useLikePostMutation()
     const unlikePost = useUnlikePostMutation()
@@ -39,6 +39,14 @@ const PostItem = ({ post }: any) => {
                 toast.success(res.data || 'Post deleted successfully')
             }
         })
+    }
+
+    const handleTagClick = (e: any, tagName: string) => {
+        e.stopPropagation()
+        e.preventDefault()
+        if (onTagClick) {
+            onTagClick(tagName)
+        }
     }
 
     return (
@@ -78,9 +86,13 @@ const PostItem = ({ post }: any) => {
                     {post.tags && post.tags.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
                             Tags: {post.tags.map((tag: any) => (
-                                <span key={tag.id || tag} className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                                <button
+                                    key={tag.id || tag}
+                                    onClick={(e) => handleTagClick(e, tag.tag || tag)}
+                                    className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition cursor-pointer"
+                                >
                                     {tag.tag || tag}
-                                </span>
+                                </button>
                             ))}
                         </div>
                     )}
