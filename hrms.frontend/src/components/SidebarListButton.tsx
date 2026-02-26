@@ -1,5 +1,5 @@
 import { useState, type ElementType, type JSX } from "react";
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import { BeakerIcon } from '@heroicons/react/24/solid'
 
 interface DropdownItem {
@@ -54,13 +54,14 @@ const SidebarListButton = ({ data }: { data: MenuItem }) => {
                             </li>
                         )}
                     </ul>
-                </> : <Link
+                </> : <NavLink
                     to={data.href ? data.href : "/"}
-                    className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                    end
+                    className={({ isActive }) => `flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${isActive ? "bg-gray-100 dark:bg-gray-700" : ""}`}
                 >
                     {Icon}
                     <span className="ml-3">{data.title}</span>
-                </Link>}
+                </NavLink>}
         </>
     )
 }
