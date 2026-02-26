@@ -23,7 +23,7 @@ const TravelPlan = ({isMy= false}: any) => {
         return (
             <div>
                 <h1 className='text-2xl font-bold mb-4'>Travel plans</h1>
-                {hasRole(["HR"]) && <Button to={"add"}>Add</Button>}
+                {hasRole(["HR"]) && !isMy && <Button to={"add"}>Add</Button>}
                 <div className='mt-6'>
                     {travelPlans && travelPlans.length > 0 ?
                         travelPlans.map((travelPlan: any) => {
