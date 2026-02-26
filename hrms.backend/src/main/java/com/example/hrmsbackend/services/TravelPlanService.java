@@ -1,6 +1,8 @@
 package com.example.hrmsbackend.services;
 
 import com.example.hrmsbackend.dtos.request.CustomUserDetails;
+import com.example.hrmsbackend.dtos.request.EmailDetailsDTO;
+import com.example.hrmsbackend.dtos.request.NotificationCreateRequestDTO;
 import com.example.hrmsbackend.dtos.request.TravelPlanRequestDTO;
 import com.example.hrmsbackend.dtos.request.TravelingEmployeeRequestDTO;
 import com.example.hrmsbackend.dtos.response.*;
@@ -29,9 +31,11 @@ public class TravelPlanService {
     private DocumentTypeRepo documentTypeRepo;
     private MediaService mediaService;
     private TravelDocumentRepo travelDocumentRepo;
+    private EmailService emailService;
+    private NotificationService notificationService;
 
     @Autowired
-    public TravelPlanService(TravelPlanRepo travelPlanRepo, EmployeeRepo employeeRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, EntityMapper entityMapper, DocumentTypeRepo documentTypeRepo, MediaService mediaService, TravelDocumentRepo travelDocumentRepo) {
+    public TravelPlanService(TravelPlanRepo travelPlanRepo, EmployeeRepo employeeRepo, TravelPlanEmployeeRepo travelPlanEmployeeRepo, EntityMapper entityMapper, DocumentTypeRepo documentTypeRepo, MediaService mediaService, TravelDocumentRepo travelDocumentRepo, EmailService emailService, NotificationService notificationService) {
         this.travelPlanRepo = travelPlanRepo;
         this.employeeRepo = employeeRepo;
         this.travelPlanEmployeeRepo = travelPlanEmployeeRepo;
@@ -39,6 +43,8 @@ public class TravelPlanService {
         this.documentTypeRepo = documentTypeRepo;
         this.mediaService = mediaService;
         this.travelDocumentRepo = travelDocumentRepo;
+        this.emailService = emailService;
+        this.notificationService = notificationService;
     }
 
     public List<TravelPlanResponseDTO> getAll() {
@@ -67,6 +73,24 @@ public class TravelPlanService {
         travelPlanRepo.save(travelPlan);
 
         List<EmployeeSummaryDTO> employeeSummaryDTOs = saveTravelPlanEmployees(dto.getEmployees(), travelPlan);
+
+        // send mail to employees
+        EmailDetailsDTO emailDetailsDTO = new EmailDetailsDTO();
+        String title = "New travel plan";
+        emailDetailsDTO.setSubject(title);
+        emailDetailsDTO.setMsgBody("A new travel plan has been created for " + travelPlan.getPlace() + " from " + travelPlan.getStartDate() + " to " + travelPlan.getEndDate() + ". Please check the details in the portal.");
+        emailDetailsDTO.setRecipients(employeeSummaryDTOs.stream().map(emp->emp.getEmail()).toList());
+
+        emailService.sendSimpleMail(emailDetailsDTO);
+
+        // send notification to employees
+        for (EmployeeSummaryDTO emp: employeeSummaryDTOs) {
+            NotificationCreateRequestDTO notificationCreateRequestDTO = new NotificationCreateRequestDTO();
+            notificationCreateRequestDTO.setUserId(emp.getId());
+            notificationCreateRequestDTO.setTitle(title);
+            notificationCreateRequestDTO.setMessage("New travel plan created for " + travelPlan.getPlace() + " from " + travelPlan.getStartDate() + " to " + travelPlan.getEndDate());
+            notificationService.createNotification(notificationCreateRequestDTO);
+        }
 
         TravelPlanResponseDTO res = entityMapper.toTravelPlanResponseDTO(travelPlan);
         res.setTravellingEmployees(employeeSummaryDTOs);

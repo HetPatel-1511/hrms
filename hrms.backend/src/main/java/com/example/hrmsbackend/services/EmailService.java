@@ -38,7 +38,13 @@ public class EmailService {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
             mailMessage.setFrom(sender);
-            mailMessage.setTo(details.getRecipient());
+
+            if (details.getRecipients() != null && !details.getRecipients().isEmpty()) {
+                mailMessage.setTo(details.getRecipients().toArray(new String[0]));
+            } else {
+                mailMessage.setTo(details.getRecipient());
+            }
+
             mailMessage.setText(details.getMsgBody());
             mailMessage.setSubject(details.getSubject());
 
