@@ -59,7 +59,7 @@ export const unlikeComment = async ({ postId, commentId }: any) => {
     return res.data
 }
 
-export const deletePost = async (postId: any) => {
-    const res = await axios.delete(`/posts/${postId}`);
+export const deletePost = async ({postId, isHr = false, remarks = null}: any) => {
+    const res = await axios.delete(`/posts/${postId}${isHr ? '/hr-delete' : ''}`, { data: { remarks } });
     return res.data
 }

@@ -26,7 +26,7 @@ const PostDetail = () => {
     const { data, isLoading, isError } = useSinglePostQuery(postId)
     const likePost = useLikePostMutation()
     const unlikePost = useUnlikePostMutation()
-    const { isOwner } = useAuthorization()
+    const { isOwner, hasRole } = useAuthorization()
     const navigate = useNavigate()
     const [commentText, setCommentText] = useState('')
     const [parentCommentId, setParentCommentId] = useState<number | null>(null)
@@ -67,9 +67,15 @@ const PostDetail = () => {
         })
     }
 
-    const handleDelete = () => {
-        if (!confirm('Are you sure you want to delete this post?')) return
-        deletePost.mutate(post.id, {
+    const handleDelete = (isOwner: boolean) => {
+        let remarks;
+        if (!isOwner) {
+            remarks = prompt('Enter remarks for deleting this post:')
+        }
+        else {
+            if (!confirm('Are you sure you want to delete this post?')) return
+        }
+        deletePost.mutate({postId: post.id, isHr: !isOwner, remarks}, {
             onSuccess: (res: any) => {
                 navigate('/post')
                 toast.success(res.data || 'Post deleted successfully')
@@ -90,12 +96,12 @@ const PostDetail = () => {
                                 <div className='text-gray-500 text-sm'>{post.createdAt ? formatDate(post.createdAt, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</div>
                         </div>
                         <div className="flex items-center space-x-3">
-                            {isOwner(post.author?.id) && (
+                            {(isOwner(post.author?.id) || hasRole(["HR"])) && (
                                 <>
-                                    <Link to={`/post/${post.id}/edit`} className="flex cursor-pointer items-center p-1 rounded hover:bg-gray-100" onClick={(e) => e.stopPropagation()}>
+                                    {isOwner(post.author?.id) && <Link to={`/post/${post.id}/edit`} className="flex cursor-pointer items-center p-1 rounded hover:bg-gray-100" onClick={(e) => e.stopPropagation()}>
                                         <PencilIcon className='h-5 w-5 text-gray-500' />
-                                    </Link>
-                                    <button onClick={handleDelete} className="flex cursor-pointer items-center p-1 rounded hover:bg-red-50" aria-label="Delete post">
+                                    </Link>}
+                                    <button onClick={() => handleDelete(isOwner(post.author?.id))} className="flex cursor-pointer items-center p-1 rounded hover:bg-red-50" aria-label="Delete post">
                                         <TrashIcon className='h-5 w-5 text-red-500' />
                                     </button>
                                 </>

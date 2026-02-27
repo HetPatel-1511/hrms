@@ -15,7 +15,7 @@ import useDeletePostMutation from '../query/queryHooks/useDeletePostMutation'
 import { toast } from 'react-toastify'
 
 const PostItem = ({ post, onTagClick }: any) => {
-    const { isOwner } = useAuthorization()
+    const { isOwner, hasRole } = useAuthorization()
     const likePost = useLikePostMutation()
     const unlikePost = useUnlikePostMutation()
     const deletePost = useDeletePostMutation()
@@ -30,11 +30,17 @@ const PostItem = ({ post, onTagClick }: any) => {
         }
     }
 
-    const handleDelete = (e: any) => {
+    const handleDelete = (e: any, isOwner: boolean) => {
         e.stopPropagation()
         e.preventDefault()
-        if (!confirm('Are you sure you want to delete this post?')) return
-        deletePost.mutate(post.id, {
+        let remarks;
+        if (!isOwner) {
+            remarks = prompt('Enter remarks for deleting this post:')
+        }
+        else {
+            if (!confirm('Are you sure you want to delete this post?')) return
+        }
+        deletePost.mutate({postId: post.id, isHr: !isOwner, remarks}, {
             onSuccess: (res: any) => {
                 toast.success(res.data || 'Post deleted successfully')
             }
@@ -102,17 +108,17 @@ const PostItem = ({ post, onTagClick }: any) => {
                         </span>
                         <div className='flex items-center'>
                             <div className='mr-2'>
-                                {isOwner(post.author?.id) && (
+                                {(isOwner(post.author?.id) || hasRole(["HR"])) && (
                                     <div className='flex justify-end ml-3 mr-0 items-center'>
-                                        <Link
+                                        {isOwner(post.author?.id) && <Link
                                             to={`/post/${post.id}/edit`}
                                             className="flex cursor-pointer items-center mt-1 hover:bg-gray-100 p-1 rounded"
                                             onClick={(e) => e.stopPropagation()}
                                         >
                                             <PencilIcon className='h-4 w-4 text-gray-500' />
-                                        </Link>
+                                        </Link>}
                                         <button
-                                            onClick={handleDelete}
+                                            onClick={(e: any) => handleDelete(e, isOwner(post.author?.id))}
                                             className="flex items-center ml-2 p-1 rounded cursor-pointer hover:bg-red-50"
                                             aria-label="Delete post"
                                         >

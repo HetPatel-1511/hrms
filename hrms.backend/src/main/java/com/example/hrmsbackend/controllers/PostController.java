@@ -1,6 +1,7 @@
 package com.example.hrmsbackend.controllers;
 
 import com.example.hrmsbackend.dtos.request.PostCreateRequestDTO;
+import com.example.hrmsbackend.dtos.request.PostDeleteRequestDTO;
 import com.example.hrmsbackend.dtos.request.PostUpdateRequestDTO;
 import com.example.hrmsbackend.dtos.response.ApiResponse;
 import com.example.hrmsbackend.dtos.response.PostDetailDTO;
@@ -9,6 +10,7 @@ import com.example.hrmsbackend.services.PostService;
 import com.example.hrmsbackend.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
@@ -111,6 +113,15 @@ public class PostController {
                                                         @AuthenticationPrincipal UserDetails userDetails) {
         PostDetailDTO dto = postService.getPostById(id, userDetails);
         return ResponseEntity.ok(ResponseUtil.success(dto, "Post fetched successfully", 200));
+    }
+
+    @DeleteMapping("/{id}/hr-delete")
+    @PreAuthorize("hasAuthority('HR')")
+    public ResponseEntity<ApiResponse<String>> deletePostByHR(@PathVariable Long id,
+                                                               @Valid @RequestBody PostDeleteRequestDTO request,
+                                                               @AuthenticationPrincipal UserDetails userDetails) {
+        String res = postService.deletePostByHR(id, request, userDetails);
+        return ResponseEntity.ok(ResponseUtil.success(res, res, 200));
     }
 
     @GetMapping

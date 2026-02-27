@@ -1,7 +1,9 @@
 package com.example.hrmsbackend.services;
 
 import com.example.hrmsbackend.dtos.request.CommentCreateRequestDTO;
+import com.example.hrmsbackend.dtos.request.EmailDetailsDTO;
 import com.example.hrmsbackend.dtos.request.PostCreateRequestDTO;
+import com.example.hrmsbackend.dtos.request.PostDeleteRequestDTO;
 import com.example.hrmsbackend.dtos.request.PostUpdateRequestDTO;
 import com.example.hrmsbackend.dtos.response.PostDTO;
 import com.example.hrmsbackend.dtos.response.PostDetailDTO;
@@ -36,9 +38,10 @@ public class PostService {
     private final EntityMapper entityMapper;
     private final LikeRepo likeRepo;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Autowired
-    public PostService(PostRepo postRepo, TagRepo tagRepo, PostTagRepo postTagRepo, EmployeeRepo employeeRepo, CommentRepo commentRepo, MediaService mediaService, EntityMapper entityMapper, LikeRepo likeRepo, NotificationService notificationService) {
+    public PostService(PostRepo postRepo, TagRepo tagRepo, PostTagRepo postTagRepo, EmployeeRepo employeeRepo, CommentRepo commentRepo, MediaService mediaService, EntityMapper entityMapper, LikeRepo likeRepo, NotificationService notificationService, EmailService emailService) {
         this.postRepo = postRepo;
         this.tagRepo = tagRepo;
         this.postTagRepo = postTagRepo;
@@ -48,6 +51,7 @@ public class PostService {
         this.entityMapper = entityMapper;
         this.likeRepo = likeRepo;
         this.notificationService = notificationService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -407,6 +411,56 @@ public class PostService {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    @Transactional
+    public String deletePostByHR(Long postId, PostDeleteRequestDTO request, UserDetails userDetails) {
+        Post post = postRepo.findActiveById(postId).orElse(null);
+        if (post == null) throw new ResourceNotFoundException("Post not found");
+
+        if (post.getIsDeleted()) {
+            throw new RuntimeException("Post already deleted");
+        }
+
+        Employee current = getCurrentEmployee(userDetails);
+        
+        // Mark post as deleted
+        post.setIsDeleted(true);
+        post.setDeletedBy(current);
+        post.setDeletionRemarks(request.getRemarks());
+        postRepo.save(post);
+
+        // Send email to the post author
+        if (post.getAuthor().getId()!=null) {
+            sendPostDeletionEmail(post, request.getRemarks());
+        }
+
+        return "Post deleted successfully";
+    }
+
+    private void sendPostDeletionEmail(Post post, String remarks) {
+        try {
+            EmailDetailsDTO emailDetails = new EmailDetailsDTO();
+            emailDetails.setRecipient(post.getAuthor().getEmail());
+            emailDetails.setSubject("Your post has been removed");
+            
+            String emailBody = String.format(
+                "Dear %s,\n\n" +
+                "Your post titled \"%s\" has been removed due to policy violations.\n\n" +
+                "Reason for removal: %s\n\n" +
+                "Best regards,\n" +
+                "HR Team",
+                post.getAuthor().getName(),
+                post.getTitle(),
+                remarks
+            );
+            
+            emailDetails.setMsgBody(emailBody);
+
+            emailService.sendSimpleMail(emailDetails);
+        } catch (Exception e) {
+            System.err.println("Failed to send deletion email to author: " + e.getMessage());
+        }
     }
 
     private Employee getCurrentEmployee(UserDetails userDetails) {

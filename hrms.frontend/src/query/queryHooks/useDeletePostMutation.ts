@@ -5,9 +5,9 @@ import { QUERY_KEY } from '../key';
 const useDeletePostMutation = () => {
     const client = useQueryClient()
     return useMutation({
-        mutationFn: (postId: any) => deletePost(postId),
+        mutationFn: ({postId, isHr = false, remarks=null}: any) => deletePost({postId, isHr, remarks}),
         onSuccess: () => {
-            client.invalidateQueries({ queryKey: [QUERY_KEY.POSTS], exact: true })
+            client.invalidateQueries({ queryKey: [QUERY_KEY.POSTS] })
         }
     })
 }

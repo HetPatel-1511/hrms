@@ -43,6 +43,9 @@ public class Post {
     @JoinColumn(name = "fk_deleted_by")
     private Employee deletedBy;
 
+    @Column(name = "deletion_remarks", length = 500)
+    private String deletionRemarks;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_media_id")
     private Media media;
@@ -110,6 +113,14 @@ public class Post {
 
     public void setDeletedBy(Employee deletedBy) {
         this.deletedBy = deletedBy;
+    }
+
+    public String getDeletionRemarks() {
+        return deletionRemarks;
+    }
+
+    public void setDeletionRemarks(String deletionRemarks) {
+        this.deletionRemarks = deletionRemarks;
     }
 
     public Media getMedia() {
