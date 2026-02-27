@@ -63,6 +63,9 @@ public class PostSpecification {
             // Exclude deleted posts
             predicates.add(criteriaBuilder.isFalse(root.get("isDeleted")));
 
+            // Order by creation date descending
+            query.orderBy(criteriaBuilder.desc(root.get("createdAt")));
+
             // Combine all predicates with AND logic
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
         };
