@@ -14,9 +14,12 @@ const Navbar = React.memo(({show=true}:any) => {
     const [showNotifications, setShowNotifications] = useState(false)
     const dispatch = useDispatch()
     const user = useSelector(selectUser);
-    const { data, isLoading, refetch } = useUnreadNotificationsQuery() 
+
+    // fetch unread notifications and subscribe to websocket only if show is true, otherwise it will cause unnecessary re-renders and websocket connections when the component is used in a page where navbar is not shown like login or register page
+    const { data, isLoading, refetch } = useUnreadNotificationsQuery(show) 
     useWebSocket({
         userId: user?.id,
+        autoConnect: show,
         onMessageReceived: (notification) => {
             refetch()
         }
