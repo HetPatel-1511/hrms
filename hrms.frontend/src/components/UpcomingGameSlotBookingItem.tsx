@@ -33,7 +33,10 @@ const UpcomingGameSlotBookingItem = ({ slotBooking }: any) => {
                                     <p className="text-sm font-medium text-gray-900">
                                         {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                                     </p>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs text-gray-400 mt-0.5 mb-1">
+                                        {new Date(slot.slotDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
                                         Status: <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${slot.slotStatus === 'BOOKED'
                                                 ? 'bg-green-100 text-green-800'
                                                 : 'bg-blue-100 text-blue-800'

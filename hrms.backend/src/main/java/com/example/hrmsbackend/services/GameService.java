@@ -290,6 +290,7 @@ public class GameService {
                     slotTimeDTO.setStartTime(slot.getStartTime());
                     slotTimeDTO.setEndTime(slot.getEndTime());
                     slotTimeDTO.setSlotStatus(slot.getSlotStatus());
+                    slotTimeDTO.setSlotDate(slot.getSlotDate());
                     slotTimeDTO.setSlotId(slot.getId());
                     
                     // Set bookings only if slot is booked
