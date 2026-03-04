@@ -3,12 +3,15 @@ package com.example.hrmsbackend.controllers;
 import com.example.hrmsbackend.dtos.response.ApiResponse;
 import com.example.hrmsbackend.dtos.response.AuthEmployeeResponseDTO;
 import com.example.hrmsbackend.dtos.response.EmployeeDetailsResponseDTO;
+import com.example.hrmsbackend.dtos.request.EmployeeRolesRequestDTO;
 import com.example.hrmsbackend.services.EmployeeService;
 import com.example.hrmsbackend.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,5 +47,11 @@ public class EmployeeController {
     @GetMapping("/role/{roleName}")
     public ResponseEntity<ApiResponse<List<AuthEmployeeResponseDTO>>> getByRole(@PathVariable String roleName) {
         return ResponseEntity.ok(ResponseUtil.success(employeeService.getByRole(roleName), "Employees fetched successfully by role", 200));
+    }
+
+    @PostMapping("/{id}/roles")
+    public ResponseEntity<ApiResponse<String>> changeEmployeeRoles(@PathVariable Long id, @RequestBody EmployeeRolesRequestDTO request) {
+        String message = employeeService.changeEmployeeRoles(id, request.getRoles());
+        return ResponseEntity.ok(ResponseUtil.success(message, message, 200));
     }
 }

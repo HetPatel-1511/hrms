@@ -5,6 +5,7 @@ export const QUERY_KEY = {
     EMPLOYEE_TRAVEL_PLAN_DOCUMENTS: "employeeTravelPlanDocuments",
     EMPLOYEE_TRAVEL_PLAN_EXPENSES: "employeeTravelPlanExpenses",
     EMPLOYEES: "employees",
+    ROLES: "roles",
     CONFIGURATIONS: "configurations",
     SINGLE_CONFIGURATION: "singleConfiguration",
     SINGLE_EMPLOYEES: "singleEmployee",

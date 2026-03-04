@@ -27,6 +27,7 @@ const FormInput = ({
                     className="basic-multi-select"
                     onMenuOpen={() => { }}
                     onChange={onChange}
+                    {...props}
                 /> :
                 type == "select" ?
                 <select
